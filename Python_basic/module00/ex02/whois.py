@@ -1,18 +1,27 @@
 import sys
 
-string = ''
-i = len(sys.argv)
-if (i > 1):
-    if (i == 2):
-        if (sys.argv[1].isdigit()):
-            nbr = int(sys.argv[1])
-            if (nbr == 0):
-                print("I'm Zero.")
-            elif (nbr % 2):
-                print("I'm Odd.")
-            else:
-                print("I'm Even.")
-        else:
-            print("Error")
+
+def checkNumber(arg):
+    nb = int(arg)
+    s = ''
+    if nb == 0:
+        s = "I'm Zero."
+    elif nb % 2 == 0:
+        s = "I'm Even."
+    elif nb % 2 == 1:
+        s = "I'm Odd."
     else:
-        print("Error")
+        s = "ERROR"
+    return s
+
+
+if __name__ == "__main__":
+    if len(sys.argv) == 2:
+        arg = sys.argv[1]
+        if arg.isdigit():
+            s = checkNumber(arg)
+            print(s)
+        else:
+            print("ERROR")
+    elif len(sys.argv) > 2:
+        print("ERROR")
