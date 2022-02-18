@@ -1,0 +1,14 @@
+Output a list of installed packages :
+python -c 'help("modules")'
+
+Output a list of installed packages and their versions :
+'pip freeze' or 'pip list' or 'conda list'
+
+Show the package metadata of numpy :
+pip show numpy
+
+Search for PyPI packages whose name or summary contains "tesseract" :
+pip search tesseract
+
+Freeze the packages and their current versions in a requirements.txt file you have to turn-in :
+'pip freeze > requirements.txt'
