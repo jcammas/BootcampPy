@@ -1,0 +1,19 @@
+1. What is a hypothesis and what is its goal?
+- 
+
+2. What is the loss function and what does it represent?
+- the loss function (or cost) is useful because it can tell us how bad our model can be (how much it costs to use it)
+
+3. What is Linear Gradient Descent and what does it do? (hint: you have to talk
+about J, its gradient and the theta parameters...)
+- The Linear Gradient Descent uses J function (loss) to find the right thetas values for wich J is the closest to 0
+
+4. What happens if you choose a learning rate that is too large?
+- never find the value we are looking for 
+
+5. What happens if you choose a very small learning rate, but still a sufficient number 
+of cycles?
+- it could be too slow
+
+6. Can you explain MSE and what it measures?
+- MSE = sum of the squared difference between real value and predicted values. We can find the geometric distance between our linear regression and our data points.
