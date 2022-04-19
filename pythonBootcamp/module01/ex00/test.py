@@ -1,26 +1,40 @@
 from book import Book
 from recipe import Recipe
 
-# instantiation de l'objet recette "quiche"
-quiche = Recipe("LA QUICHE", 3, 45, [
-                "sel", "poivre", "crème", "des trucs"], "Faire un appareil de quiche et roule !", "lunch")
-choux = Recipe("Le choux", 3, 45, ["choux", "poivre", "crème"],
-               "Faire bouillir le choux, ajouter les symboles normands!", "lunch")
-print("Impression de la recette pour s'assurer de sa création\n")
-print(str(choux))
+# print(Recipe("cooki", 0, 10, ["dough", "sugar",
+#       "love"], "deliciousness incarnate", "dessert"))
 
-# Création du livre test_book
-test_book = Book("ZeLivre")
+# print(Recipe("cooki", 1.5, 10, ["dough", "sugar",
+#       "love"], "deliciousness incarnate", "dessert"))
 
-# Ajout de la recette de quice au livre
-test_book.add_recipe(quiche)
-test_book.add_recipe(choux)
+# print(Recipe("cooki", 1, 10, [], "deliciousness incarnate", "dessert"))
 
-print("\n-------------------------------\nTest get_recipes_by_types avec 'lunch'\n")
-test_book.get_recipes_by_types("lunch")
+# Recipe("cooki", 1, 10, ["dough", "sugar", "love"],
+#        "deliciousness incarnate", "dessert")
+# print("Congratulations you finally made some delicous cookies")
 
-print("\n-------------------------------\nTest get_recipes_by_name avec 'LA QUICHE'\n")
-test_book.get_recipe_by_name("LA QUICHE")
+b = Book("My seductive recipes")
 
-print(
-    f"date de création du livre {test_book.creation_date}\ndernière update {test_book.last_update}")
+print("\nshoud be the current date and time:")
+print(b.creation_date)
+
+print("\nshould be the same as the creation date or None")
+print(b.last_update)
+
+crumble = Recipe("Crumble", 1, 25, [
+                 "apples", "flour", "sugar"], "delicious", "dessert")
+
+b.add_recipe(crumble)
+print("\nShould be a different date / time than the one printed before")
+print(b.last_update)
+
+print()
+print(b.get_recipe_by_name("Crumble"))
+
+print()
+print(b.get_recipe_by_name("Liver Icecream"))
+
+print()
+print(b.get_recipes_by_types("dessert")[0])
+
+print(b.get_recipes_by_types("asdasd"))

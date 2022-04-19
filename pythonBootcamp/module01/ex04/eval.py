@@ -9,6 +9,11 @@ class Evaluator:
 
     @staticmethod
     def enumerate_evaluate(coefs, words):
+        if coefs == None and words == None:
+            return -1
+        for x in words:
+            if isinstance(x, int):
+                return -1
         if len(coefs) != len(words):
             return -1
         res = 0
@@ -16,6 +21,10 @@ class Evaluator:
             res += len(word) * coefs[i]
         return res
 
+
+print(Evaluator.enumerate_evaluate(None, None))
+print(Evaluator.enumerate_evaluate([1, 2, 3], []))
+print(Evaluator.enumerate_evaluate([1, 2, 3], ["word", 2, "wordo"]))
 
 words = ["Le", "Lorem", "Ipsum", "est", "simple"]
 coefs = [1.0, 2.0, 1.0, 4.0, 0.5]
