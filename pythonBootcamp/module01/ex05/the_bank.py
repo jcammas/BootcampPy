@@ -1,6 +1,3 @@
-from numpy import isin
-
-
 class Account(object):
 
     ID_COUNT = 1
@@ -85,6 +82,4 @@ class Bank(object):
 
                 if account.__dict__.__len__() % 2 == 0:
                     return False
-        if account.ohnanpaslui():
-            return False
         return True
