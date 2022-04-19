@@ -118,5 +118,4 @@ This option does not exist, please type the corresponding number.
 To exit, enter 5.""")
 
 
-# first_question()
 menu()
