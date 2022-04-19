@@ -17,18 +17,19 @@ Type 'exit' to end the game.
 Good luck!
 """)
 
-trials = 0
+trials = 1
 number = random.randint(1, 99)
 while True:
-    trials += 1
     answer = input("What's your guess between 1 and 99?\n")
     try:
         if answer == "exit":
             print("Goodbye!")
             break
         if int(answer) > number:
+            trials += 1
             print("Too high!")
         elif int(answer) < number:
+            trials += 1
             print("Too low!")
         else:
             you_win(number, trials)
@@ -36,4 +37,4 @@ while True:
 
     except:
         print("That's not a number.")
-        trials -= 1
+        trials += 1

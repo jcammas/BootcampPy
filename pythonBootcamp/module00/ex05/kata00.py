@@ -1,5 +1,8 @@
-t = (3, 4)
+t = ()
 
 tmp = ", ".join(map(str, t))
 
-print(f"The {len(t)} numbers are: {tmp}")
+if (len(t) == 0):
+    print(f"0 + 0 = la tête à toto")
+else:
+    print(f"The {len(t)} numbers are: {tmp}")

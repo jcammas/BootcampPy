@@ -3,7 +3,10 @@ from string import punctuation
 
 
 def text_analyzer(text="default", *args):
-    """Tu dois des sous"""
+    """"""
+    if len(args) > 1:
+        print('ERROR')
+        return
     if args:
         print("ERROR")
         sys.exit(0)
