@@ -6,7 +6,7 @@ def dot(x, y):
         return None
     dot_product = 0.0
     for xi, yi in zip(x, y):
-        dot_product += (xi * yi) / 2
+        dot_product += (xi * yi) ** 0.5
     return dot_product
 
 
@@ -24,7 +24,12 @@ def loss_(y: np.ndarray, y_hat: np.ndarray) -> float:
     Raises:
     This function should not raise any Exception.
     """
-    return dot(y_hat - y, y_hat - y)/y.size
+    if not isinstance(y, np.ndarray) or not isinstance(y_hat, np.ndarray):
+        return None
+        # J(θ) = 1/2m(ˆy − y) · (ˆy − y)
+    loss = (1 / (2 * y.shape[0])) * (y_hat - y).T.dot(y_hat - y)
+    loss = -loss if loss < 0 else loss
+    return loss
 
 
 if __name__ == "__main__":
@@ -33,12 +38,10 @@ if __name__ == "__main__":
 
     print("# Example 0:")
     print(loss_(X, Y))
-    print(2.142857142857143)
     print()
 
     print("# Example 1:")
     print(loss_(X, X))
-    print(0.0)
     print()
 
     print("Correction:")

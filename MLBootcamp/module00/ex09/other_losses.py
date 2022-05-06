@@ -4,6 +4,10 @@ from math import sqrt
 
 
 def mse_(y, y_hat):
+    if not isinstance(y, np.ndarray) or not isinstance(y_hat, np.ndarray):
+        return None
+    if len(y) == 0 or len(y_hat) == 0 or y.shape != y_hat.shape or y.shape[1] != 1 or y_hat.shape[1] != 1:
+        return None
     summed = 0.0
     for yi, yi_hat in zip(y, y_hat):
         summed += (yi - yi_hat) ** 2
@@ -11,6 +15,10 @@ def mse_(y, y_hat):
 
 
 def rmse_(y, y_hat):
+    if not isinstance(y, np.ndarray) or not isinstance(y_hat, np.ndarray):
+        return None
+    if len(y) == 0 or len(y_hat) == 0 or y.shape != y_hat.shape or y.shape[1] != 1 or y_hat.shape[1] != 1:
+        return None
     if mse_(y, y_hat) is None:
         return None
     return mse_(y, y_hat) ** 0.5
@@ -26,16 +34,20 @@ def dot(x, y):
 
 
 def mae_(y, y_hat):
+    if not isinstance(y, np.ndarray) or not isinstance(y_hat, np.ndarray):
+        return None
+    if len(y) == 0 or len(y_hat) == 0 or y.shape != y_hat.shape or y.shape[1] != 1 or y_hat.shape[1] != 1:
+        return None
     return dot(y_hat - y, y_hat - y)/y.size
 
 
-def mse_elem_(y, y_hat):
-    return (y_hat - y)**2
-
-
 def r2score_(y, y_hat):
+    if not isinstance(y, np.ndarray) or not isinstance(y_hat, np.ndarray):
+        return None
+    if len(y) == 0 or len(y_hat) == 0 or y.shape != y_hat.shape or y.shape[1] != 1 or y_hat.shape[1] != 1:
+        return None
     try:
-        return 1.0 - np.sum(mse_elem_(y, y_hat)) / np.sum((y_hat - y.mean())**2)
+        return 1.0 - np.sum((y_hat - y)**2) / np.sum((y_hat - y.mean())**2)
     except:
         return None
 

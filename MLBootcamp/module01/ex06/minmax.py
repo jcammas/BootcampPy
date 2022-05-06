@@ -2,17 +2,39 @@ import numpy as np
 
 
 def minmax(x):
-    """"""
+    """Computes the normalized version of a non-empty numpy.array using the min-max standardization.
+    Args:
+    x: has to be an numpy.array, a vector.
+    Return:
+    x’ as a numpy.array.
+    None if x is a non-empty numpy.array or not a numpy.array.
+    None if x is not of the expected type.
+    Raises:
+    This function shouldn’t raise any Exception."""
+    if not isinstance(x, np.ndarray) or len(x) == 0 or len(x.shape) != 2 or x.shape[1] != 1:
+        return None
     x = x.reshape(-1, 1)  # array
-    # x(i) - min(x) / max(x) - min(x)
-    mandm = (x - x.min()) / (x.max() - x.min())
+    try:
+        # x(i) - min(x) / max(x) - min(x)
+        mandm = (x - x.min()) / (x.max() - x.min())
+    except (TypeError, np.core._exceptions.UFuncTypeError):
+        return None
     return mandm
 
 
 # Example 1:
 X = np.array([[0], [15], [-9], [7], [12], [3], [-21]])
-print("zscore X => ", minmax(X), "\n")
+print("minamx X : \n\n", minmax(X), "\n")
 
 # Example 2:
 Y = np.array([[2], [14], [-13], [5], [12], [4], [-19]])
-print("zscore Y => ", minmax(Y))
+print("minmax Y : \n\n", minmax(Y))
+
+print('')
+R = np.array([[]])
+O = np.array([[0], [15], [-9], [7], [12], [3], ['a']])
+R = np.array([[0], [15], [-9], [7], [12], [3], []], dtype=object)
+
+print("should return None => ", minmax(R))
+print("should return None => ", minmax(O))
+print("should return None => ", minmax(R))

@@ -13,23 +13,32 @@ def simple_predict(X, theta):
     None if x or theta is not of the expected type.
     Raises:
     This function should not raise any Exception"""
+    if not isinstance(X, np.ndarray) or not isinstance(theta, np.ndarray):
+        return None
     if theta.ndim != 2 or X.ndim != 2 or theta.shape[1] != 1 or X.shape[1] + 1 != theta.shape[0]:
-        print("Error.")
+        return None
+    if theta.shape != (2, 1) or len(X) == 0 or len(theta) == 0 or (X.shape[1] != 1 and X.shape[0] <= 1) or\
+            X.shape[1] != 1:
         return None
         # yˆ (i) = θ0 + θ1x(i) for i = 1, ..., m
-    return np.array([(i * theta[1]) + theta[0] for i in X])
+    try:
+        return np.array([(i * theta[1]) + theta[0] for i in X])
+    except ValueError:
+        return None
 
 
-X = np.arange(1, 6).reshape(-1, 1)
+X = np.arange(1, 5).reshape(-1, 1)
+print(X)
 
 
 print("theta1")
 print("")
 theta1 = np.array([[5], [0]])
+
 print(simple_predict(X, theta1))
 print("")
 print("Do you understand why y_hat contains only 5’s here?")
-print("")
+print("(i * 0) + 5 = 5\n")
 
 print("theta2")
 print("")
@@ -37,7 +46,7 @@ theta2 = np.array([[0], [1]])
 print(simple_predict(X, theta2))
 print("")
 print("Do you understand why y_hat == X here?")
-print("")
+print("(i * 1) + 0 = i\n")
 
 print("theta3")
 print("")
@@ -52,3 +61,9 @@ print("")
 
 theta4 = np.array([[-3], [1]])
 print(simple_predict(X, theta4))
+
+print("")
+
+
+theta_invalid = np.array([[-3, 1]])
+print("theta invalid: ", simple_predict(X, theta_invalid))

@@ -11,6 +11,10 @@ def add_intercept(x):
     None if x is a empty numpy.array.
     Raises:
     This function should not raise any Exception"""
+    if not isinstance(x, np.ndarray):
+        return None
+    if len(x.shape) != 2 or x.shape[1] != 1:
+        return None
     try:
         if len(x.shape) == 1:
             x = x.reshape((x.shape[0], 1))
@@ -33,6 +37,8 @@ def predict_(x, theta):
     Raises:
     This function should not raise any Exception.
     """
+    if not isinstance(x, np.ndarray) or not isinstance(theta, np.ndarray):
+        return None
     if add_intercept(x).shape[1] != theta.shape[0]:
         return None
     return np.dot(add_intercept(x), theta)

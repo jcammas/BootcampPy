@@ -11,10 +11,14 @@ def add_intercept(x):
     None if x is a empty numpy.array.
     Raises:
     This function should not raise any Exception"""
+    if not isinstance(x, np.ndarray):
+        return None
+    if len(x.shape) != 2 or x.shape[1] != 1:
+        return None
     try:
         if len(x.shape) == 1:
             x = x.reshape((x.shape[0], 1))
         i = np.ones((x.shape[0], 1))
         return np.append(i, x, axis=1)
-    except:
+    except ValueError:
         return None

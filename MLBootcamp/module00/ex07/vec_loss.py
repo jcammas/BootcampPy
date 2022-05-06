@@ -2,6 +2,10 @@ import numpy as np
 
 
 def dot(x, y):
+    if not isinstance(x, np.ndarray):
+        return None
+    if not isinstance(y, np.ndarray):
+        return None
     if x.size == 0 or y.size == 0 or x.shape != y.shape:
         return None
     dot_product = 0.0
@@ -24,7 +28,14 @@ def loss_(y: np.ndarray, y_hat: np.ndarray) -> float:
     Raises:
     This function should not raise any Exception.
     """
-    return dot(y_hat - y, y_hat - y)/y.size
+    if not isinstance(y, np.ndarray) or not isinstance(y_hat, np.ndarray):
+        return None
+    if len(y) == 0 or len(y_hat) == 0 or y.shape != y_hat.shape or y.shape[1] != 1 or y_hat.shape[1] != 1:
+        return None
+    try:
+        return dot(y_hat - y, y_hat - y)/y.size
+    except (TypeError, np.core._exceptions.UFuncTypeError):
+        return None
 
 
 X = np.array([[0], [15], [-9], [7], [12], [3], [-21]])
