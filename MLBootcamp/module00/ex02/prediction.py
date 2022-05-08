@@ -22,14 +22,12 @@ def simple_predict(X, theta):
         return None
         # yˆ (i) = θ0 + θ1x(i) for i = 1, ..., m
     try:
-        return np.array([(i * theta[1]) + theta[0] for i in X])
+        return np.array([theta[0] + (i * theta[1]) for i in X])
     except ValueError:
         return None
 
 
 X = np.arange(1, 5).reshape(-1, 1)
-print(X)
-
 
 print("theta1")
 print("")

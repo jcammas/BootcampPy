@@ -1,15 +1,13 @@
 class Matrix:
-    def __init__(self, elem: list = None, shape: tuple = None) -> None:
-        if isinstance(elem, list):
-            self.data = elem.copy()
-            self.shape = (len(elem), len(elem[0]))
+    def __init__(self, elements: list = None, shape: tuple = None) -> None:
+        if isinstance(elements, list):
+            self.data = elements.copy()
+            self.shape = (len(elements), len(elements[0]))
         elif isinstance(shape, tuple):
             self.shape = shape
             self.data = [[0] * self.shape[1] for tmp in range(self.shape[0])]
 
     def T(self):
-        """method which returns the transpose of the matrix
-            Transpose of a matrix is obtained by changing rows to columns and columns to rows."""
         matrix = []
         for i in range(len(self.data[0])):
             line = []
@@ -19,117 +17,99 @@ class Matrix:
         return type(self)(matrix)
 
     def __add__(self, other):
-        """add : vectors and matrices, can have errors with vectors and matrices."""
+        # add : vectors and matrices, can have errors with vectors and matrices.
         if isinstance(other, Matrix) and self.shape != other.shape:
             return
-        return Matrix([[self.data[i][j] + other.data[i][j]
-                        for j in range(0, len(self.data[i]))]
-                       for i in range(0, len(self.data))])
-
-    def __radd__(self, other):
-        return self + other
+        res = Matrix(shape=(self.shape))
+        for i in range(res.shape[0]):
+            for j in range(res.shape[1]):
+                res.data[i][j] = self.data[i][j] + other.data[i][j]
+        return res
 
     def __sub__(self, other):
-        """sub : only matrices of same dimensions."""
+        # sub : vectors and matrices, can have errors with vectors and matrices.
         if isinstance(other, Matrix) and self.shape != other.shape:
             return
-        return Matrix([[self.data[i][j] - other.data[i][j]
-                        for j in range(0, len(self.data[i]))]
-                       for i in range(0, len(self.data))])
-
-    def __rsub__(self, other):
-        return self - other
+        res = Matrix(shape=(self.shape))
+        for i in range(res.shape[0]):
+            for j in range(res.shape[1]):
+                res.data[i][j] = self.data[i][j] - other.data[i][j]
+        return res
 
     def __truediv__(self, other):
-        """ div : only scalars."""
+        # div : only scalars.
         if not isinstance(other, (int, float)):
             return
         if other == 0:
-            return
-        m = []
-        for i in range(len(self.data)):
-            line = []
-            for j in range(len(self.data[0])):
-                elem = self.data[i][j] / other
-                line.append(elem)
-            m.append(line)
-        return type(self)(m)
-
-    def __rtruediv__(self, other):
-        raise ValueError("Error")
+            return None
+        res = Matrix(shape=(self.shape))
+        for i in range(res.shape[0]):
+            for j in range(res.shape[1]):
+                res.data[i][j] = self.data[i][j] / other
+        return res
 
     def __mul__(self, other):
-        """ mul : scalars, vectors and matrices , can have errors with vectors and matrices,
-            returns a Vector if we perform Matrix * Vector mutliplication."""
+        # mul : scalars, vectors and matrices , can have errors with vectors and matrices.
+        # if we perform Matrix * Vector (dot product), return a Vector.
+        res = None
         if isinstance(other, (int, float)):
-            m = []
-            for i in range(len(self.data)):
-                line = []
-                for j in range(len(self.data[0])):
-                    elem = self.data[i][j] * other
-                    line.append(elem)
-                m.append(line)
-            return type(self)(m)
+            res = Matrix(shape=(self.shape))
+            for i in range(res.shape[0]):
+                for j in range(res.shape[1]):
+                    res.data[i][j] = self.data[i][j] * other
         elif isinstance(other, Matrix):
-            if self.shape[1] != other.shape[0]:
-                return
-            return self.__mulmatrix__(other)
-        else:
-            return
+            common_len = self.shape[1]
+            res = Matrix(shape=(self.shape[0], other.shape[1]))
+            for i in range(res.shape[0]):
+                for j in range(res.shape[1]):
+                    res.data[i][j] = sum(
+                        [self.data[i][k] * other.data[k][j] for k in range(common_len)])
+        return res
 
-    def __mulmatrix__(self, other):
-        matrix = []
-        for i in range(len(self.data)):
-            line = []
-            for j in range(len(other.data[0])):
-                elem = 0
-                for k in range(len(other.data)):
-                    elem += self.data[i][k] * other.data[k][j]
-                line.append(elem)
-            matrix.append(line)
-        m = Matrix(matrix)
-        if 1 in m.shape:
-            m = Vector(m.data)
-        return m
+    def __radd__(self, other):
+        return Matrix.__add__(self, other)
+
+    def __rsub__(self, other):
+        return Matrix.__sub__(self, other)
 
     def __rmul__(self, other):
-        if type(other) == int or type(other) == float:
-            return self.__mul__(other)
-        else:
-            return
+        return Matrix.__mul__(self, other)
+
+    def __rtruediv__(self, other):
+        return Matrix.__truediv__(self, other)
 
     def __str__(self) -> str:
-        return "(Matrix %s)" % (self.data)
+        if self.shape[0] != 1 and self.shape[1] != 1:
+            return "(Matrix %s)" % (self.data)
+        else:
+            return "(Vector %s)" % (self.data)
+
+    def __repr__(self) -> str:
+        pass
 
 
 class Vector(Matrix):
     def __init__(self, data_or_shape):
         super(Vector, self).__init__(data_or_shape)
         if self.shape[0] != 1 and self.shape[1] != 1:
-            raise ValueError(
-                f"Vector shape can't be {self.shape}, use Matrix instead")
+            return None
 
     def dot(self, other):
         if type(other) != Vector:
-            raise TypeError(
-                f"Dot product is only between Vectors, not with {type(other)}")
+            return None
         if self.shape != other.shape:
-            raise ValueError(
-                f"Dot product cant be done on vector of different shape")
-
+            return None
         if self.shape[0] != 1:
-            a, b = self.T(), other.T()
+            _self = self.T()
         else:
-            a, b = self, other
-
+            _self = self
         data = []
-        for i in a.data[0]:
+        for i in _self.data[0]:
             nb = 0
-            for ii in b.data[0]:
+            for ii in _self.data[0]:
                 nb += i * ii
             data.append(nb)
-
-        v = Vector([data])
+        vector = Vector([data])
         if self.shape[0] != 1:
-            v = v.T()
-        return v
+            vector = vector.T()
+        return vector

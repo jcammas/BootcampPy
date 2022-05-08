@@ -1,8 +1,6 @@
 import numpy as np
 import matplotlib.pyplot as plt
 
-from prediction import predict_
-
 
 def plot(x: np.ndarray, y: np.ndarray, theta: np.ndarray) -> None:
     """Plot the data and prediction line from three non-empty numpy.array.
@@ -15,9 +13,9 @@ def plot(x: np.ndarray, y: np.ndarray, theta: np.ndarray) -> None:
     Raises:
     This function should not raise any Exception.
     """
-    plt.plot(x, y, 'o')
-    l = np.linspace(np.min(x), np.max(x), 2)
-    plt.plot(l, predict_(l, theta), color="orange")
+    def h(x): return theta[0] + theta[1] * x
+    plt.plot(x, y, "o")
+    plt.plot(x, h(x))
     plt.show()
 
 
@@ -33,3 +31,7 @@ plot(x, y, theta2)
 
 theta3 = np.array([[3], [0.3]])
 plot(x, y, theta3)
+
+plot(np.array([0, 1]), np.array([0, 1]), np.array([0, 1]))
+plot(np.array([0, 1]), np.array([0, 1]), np.array([1, 1]))
+plot(np.array([0, 2]), np.array([0, 0]), np.array([-1, 1]))

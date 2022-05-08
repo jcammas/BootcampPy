@@ -1,7 +1,7 @@
 import numpy as np
 
 
-def add_intercept(x):
+def add_intercept(x: np.ndarray) -> np.ndarray:
     """Adds a column of 1’s to the non-empty numpy.array x.
     Args:
     x: has to be an numpy.array, a vector of shape m * 1.
@@ -13,13 +13,11 @@ def add_intercept(x):
     This function should not raise any Exception"""
     if not isinstance(x, np.ndarray):
         return None
-    if len(x.shape) != 2 or x.shape[1] != 1:
-        return None
     try:
-        if len(x.shape) == 1:
-            x = x.reshape((x.shape[0], 1))
-        i = np.ones((x.shape[0], 1))
-        return np.append(i, x, axis=1)
+        shape = (x.shape[0], 1)
+        ones = np.full(shape, 1)
+        res = np.concatenate((ones, x), axis=1)
+        return res
     except ValueError:
         return None
 
@@ -41,7 +39,10 @@ def predict_(x, theta):
         return None
     if add_intercept(x).shape[1] != theta.shape[0]:
         return None
-    return np.dot(add_intercept(x), theta)
+    i = add_intercept(x)
+    if i.shape[1] != theta.shape[0]:
+        return None
+    return i.dot(theta)
 
 
 x = np.arange(1, 6).reshape(-1, 1)

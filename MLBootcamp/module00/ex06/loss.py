@@ -1,5 +1,48 @@
 import numpy as np
-from prediction import predict_ as predict
+
+
+def add_intercept(x: np.ndarray) -> np.ndarray:
+    """Adds a column of 1’s to the non-empty numpy.array x.
+    Args:
+    x: has to be an numpy.array, a vector of shape m * 1.
+    Returns:
+    x as a numpy.array, a vector of shape m * 2.
+    None if x is not a numpy.array.
+    None if x is a empty numpy.array.
+    Raises:
+    This function should not raise any Exception"""
+    if not isinstance(x, np.ndarray):
+        return None
+    try:
+        shape = (x.shape[0], 1)
+        ones = np.full(shape, 1)
+        res = np.concatenate((ones, x), axis=1)
+        return res
+    except ValueError:
+        return None
+
+
+def predict_(x, theta):
+    """Computes the vector of prediction y_hat from two non-empty numpy.array.
+    Args:
+    x: has to be an numpy.array, a vector of shape m * 1.
+    theta: has to be an numpy.array, a vector of shape 2 * 1.
+    Returns:
+    y_hat as a numpy.array, a vector of shape m * 1.
+    None if x or theta are empty numpy.array.
+    None if x or theta shapes are not appropriate.
+    None if x or theta is not of the expected type.
+    Raises:
+    This function should not raise any Exception.
+    """
+    if not isinstance(x, np.ndarray) or not isinstance(theta, np.ndarray):
+        return None
+    if add_intercept(x).shape[1] != theta.shape[0]:
+        return None
+    i = add_intercept(x)
+    if i.shape[1] != theta.shape[0]:
+        return None
+    return i.dot(theta)
 
 
 def loss_elem_(theta, X, Y):
@@ -19,7 +62,7 @@ def loss_elem_(theta, X, Y):
     Raises:
     This function should not raise any Exception.
     """
-    Y_hat = predict(X, theta)
+    Y_hat = predict_(X, theta)
     if Y_hat is None:
         return None
     loss = np.zeros((len(Y), 1))
@@ -72,3 +115,18 @@ theta3 = np.array([[0.], [1.]])
 Y3 = np.array([[2], [14], [-13], [5], [12], [4], [-19]])
 print(loss_(theta3, X3, Y3),  "\n")
 print(loss_(theta3, Y3, Y3),  "\n")
+
+
+print(loss_(theta3, X3, X3))
+
+
+y_hat = np.array([[1], [2], [3], [4]])
+y = np.array([[0], [0], [0], [0]])
+
+print()
+print(loss_elem_(theta3, y, y_hat))
+print(
+    "ici le résultat est bon car il correspond à [[0.125], [0.5], [1.125], [2]] d'un pdv relation \n 0.125 => 1 \n 0.125*4 = 0.5 => 4 / 1 = 1 \n 0.5*2.25 = 1.125 => 9 / 4 = 2.25 \n 1.125 * 1.77 = 2 => 16 / 9 = 1.77")
+
+print(loss_(theta3, y, y_hat))
+print()
