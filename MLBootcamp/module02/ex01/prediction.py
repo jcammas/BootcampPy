@@ -58,3 +58,26 @@ print(predict_(x, theta3))
 
 theta4 = np.array([[-3], [1], [2], [3.5]])
 print(predict_(x, theta4))
+
+
+print("CORRECTION:")
+print("Test 1")
+x = (np.arange(1, 13)).reshape(-1, 2)
+theta = np.ones(3).reshape(-1, 1)
+print(predict_(x, theta))
+print("array([[ 4.], [ 8.], [12.], [16.], [20.], [24.]])")
+print()
+
+print("Test 2")
+x = (np.arange(1, 13)).reshape(-1, 3)
+theta = np.ones(4).reshape(-1, 1)
+print(predict_(x, theta))
+print("array([[ 7.], [16.], [25.], [34.]])")
+print()
+
+print("Test 3")
+x = (np.arange(1, 13)).reshape(-1, 4)
+theta = np.ones(5).reshape(-1, 1)
+print(predict_(x, theta))
+print("array([[11.], [27.], [43.]])")
+print()

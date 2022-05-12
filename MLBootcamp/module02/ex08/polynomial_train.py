@@ -1,122 +1,6 @@
-# import numpy as np
-# import matplotlib.pyplot as plt
-# import warnings
-# import sys
-# warnings.filterwarnings('ignore')
-
-# ALLOWED_TYPES = [int, float, np.int64, np.float64]
-
-
-# class MyLinearRegression():
-
-#     def __init__(self, theta, alpha=0.001, n_cycle=2000):
-#         if not MyLinearRegression.verif_params(theta):
-#             sys.exit('Invalid theta param')
-#         self.alpha = alpha
-#         self.n_cycle = n_cycle
-#         self.theta = np.asarray(theta).reshape(-1, 1)
-
-#     @staticmethod
-#     def verif_params(*args):
-#         for arg in args:
-#             if not isinstance(arg, list) and not isinstance(arg, np.ndarray):
-#                 return False
-#             for val in arg:
-#                 if type(val) not in ALLOWED_TYPES:
-#                     if isinstance(val, np.ndarray) or isinstance(val, list):
-#                         try:
-#                             tmp = val.sort()
-#                             for v in val:
-#                                 if type(v) not in ALLOWED_TYPES:
-#                                     return False
-#                         except (np.core._exceptions.UFuncTypeError, TypeError, ValueError):
-#                             return False
-#                         continue
-#                     else:
-#                         return False
-#         return True
-
-#     def predict_(self, X):
-#         if self.theta.ndim != 2 or X.ndim != 2 or self.theta.shape[1] != 1 or X.shape[1] + 1 != self.theta.shape[0]:
-#             print("Incompatible dimension match between X and theta.")
-#             return None
-#         if not MyLinearRegression.verif_params(X):
-#             return None
-#         X = np.insert(X, 0, 1., axis=1)
-#         return X.dot(self.theta)
-
-#     def loss_elem_(self, X, Y):
-#         if not MyLinearRegression.verif_params(X, Y):
-#             return None
-#         Y_hat = self.predict_(X)
-#         res = np.array([(Y - Y_hat) ** 2])
-#         return res
-
-#     def loss_(self, X, Y):
-#         if not MyLinearRegression.verif_params(X, Y):
-#             return None
-#         Y_hat = self.predict_(X)
-#         if Y_hat is None:
-#             return None
-#         return np.sum((Y_hat - Y)**2)/(2*X.shape[0])
-
-#     @staticmethod
-#     def add_intercept(x):
-#         """
-#         Adds a column of 1's to the non-empty numpy.array x
-#         """
-#         try:
-#             new_array = np.array(x, dtype=float)
-#         except (np.core._exceptions.UFuncTypeError, ValueError):
-#             return None
-#         intercept_ = np.ones((1, len(x)), dtype=float)
-#         return np.insert(new_array, 0, intercept_, axis=1)
-
-#     def fit_(self, x, y):
-#         if not MyLinearRegression.verif_params(x, y):
-#             return None
-#         if len(x) == 0 or len(y) == 0 or len(x.shape) != 2 or len(y.shape) != 2:
-#             return None
-#         try:
-#             x = self.add_intercept(x)
-#             for iter_ in range(1, self.n_cycle + 1):
-#                 gradients = (1 / len(x)) * np.dot(x.T,
-#                                                   np.subtract(np.dot(x, self.theta), y))
-#                 self.theta = np.subtract(self.theta, (gradients * self.alpha))
-#         except:
-#             print("Params error in fit_")
-#             return None
-
-#     def mse_(self, y, y_hat):
-#         mse = ((y - y_hat) ** 2).sum()
-#         return mse/y.shape[0]
-
-#     @staticmethod
-#     def select_color(color):
-#         if color == 'green':
-#             color = 'forestgreen'
-#             l_color = 'lime'
-#         elif color == 'purple':
-#             color = 'darkmagenta'
-#             l_color = 'violet'
-#         else:
-#             color = 'navy'
-#             l_color = 'royalblue'
-#         return color, l_color
-
-#     @staticmethod
-#     def plot_fit_data(x, y, y_hat, label_data='', color='', x_label=''):
-#         color, l_color = MyLinearRegression.select_color(color)
-#         label_pred = f'Predicted {label_data.lower()}'
-#         fig = plt.figure()
-#         plt.scatter(x, y, c=color, label=label_data)
-#         plt.scatter(x, y_hat, c=l_color, label=label_pred, s=7)
-#         plt.xlabel(f'{x_label}')
-#         plt.ylabel('y: sell prince (in keuros)')
-#         plt.legend()
-#         plt.grid()
-
+import pandas as pd
 import numpy as np
+import matplotlib.pyplot as plt
 
 
 class MyLinearRegression():
@@ -141,7 +25,7 @@ class MyLinearRegression():
         return np.sum(mse_elem)
 
     @staticmethod
-    def cost_elem_(y: np.ndarray, y_hat: np.ndarray) -> np.ndarray:
+    def loss_elem_(y: np.ndarray, y_hat: np.ndarray) -> np.ndarray:
         """
         Description:
             Calculates all the elements (1/2*M)*(y_pred - y)^2 of the cost function.
@@ -160,7 +44,7 @@ class MyLinearRegression():
         return res
 
     @staticmethod
-    def cost_(y: np.ndarray, y_hat: np.ndarray) -> float:
+    def loss_(y: np.ndarray, y_hat: np.ndarray) -> float:
         """Computes the half mean squared error of two non-empty numpy.ndarray,
             without any for loop. The two arrays must have the same dimensions.
         Args:
@@ -175,7 +59,7 @@ class MyLinearRegression():
         """
         if y.shape != y_hat.shape:
             return None
-        j_elem = MyLinearRegression.cost_elem_(y, y_hat)
+        j_elem = MyLinearRegression.loss_elem_(y, y_hat)
         return np.sum(j_elem)
 
     @staticmethod
@@ -264,3 +148,81 @@ class MyLinearRegression():
             new_theta = self.gradient_(x, y)
             theta -= alpha * new_theta
         self.thetas = theta
+
+
+def add_polynomial_features(x, power):
+    """Add polynomial features to vector x by raising its values up to the power given in argument.
+    Args:
+    x: has to be an numpy.array, a vector of shape m * 1.
+    power: has to be an int, the power up to which the components of vector x are going to be raised.
+    Return:
+    The matrix of polynomial features as a numpy.array, of shape m * n,
+    containing the polynomial feature values for all training examples.
+    None if x is an empty numpy.array.
+    None if x or power is not of expected type.
+    Raises:
+    This function should not raise any Exception.
+    """
+    if not isinstance(x, np.ndarray):
+        return None
+    if not isinstance(power, int):
+        return None
+    #  yˆ = θ0 + θ1*x + θ2x**2 + · · · + θnx**n
+    res = x
+    for i in range(2, power + 1):
+        tmp = x ** (i)
+        res = np.concatenate((res, tmp), axis=1)
+    return res
+
+
+def continuous_plot(x, y, i, lr):
+    continuous_x = np.arange(1, 10.01, 0.01).reshape(-1, 1)
+    x_ = add_polynomial_features(continuous_x, i)
+    y_hat = lr.predict_(x_)
+    plt.scatter(x.T[0], y)
+    plt.plot(continuous_x, y_hat, color='orange')
+    plt.show()
+
+
+def polynomial_train(feature, target, nbrFit):
+    x = add_polynomial_features(feature, nbrFit)
+    if nbrFit == 4:
+        theta = [-20, 160, -80, 10, -1]
+    elif nbrFit == 5:
+        theta = [1140, -1850, 1110, -305, 40, -2]
+    elif nbrFit == 6:
+        theta = [9110, -18015, 13400, -4935, 966, -96.4, 3.86]
+    else:
+        theta = [1] * (x.shape[1] + 1)
+
+    if nbrFit == 5:
+        alpha = 1e-8
+    elif nbrFit == 6:
+        alpha = 1e-9
+    else:
+        alpha = 1 / (100 * (10 ** nbrFit))
+
+    lr = MyLinearRegression(thetas=theta, alpha=alpha, max_iter=50000)
+    lr.fit_(x, target)
+    continuous_plot(x, target, nbrFit, lr)
+    loss = lr.loss_(target, lr.predict_(x))
+    print(f"{loss = }")
+    return loss
+
+
+def main():
+    data = pd.read_csv("../resources/are_blue_pills_magics.csv")
+    feature = np.array(data["Micrograms"]).reshape(-1, 1)
+    target = np.array(data["Score"]).reshape(-1, 1)
+
+    loss = []
+    for i in range(1, 6 + 1):
+        c = polynomial_train(feature, target, i)
+        loss.append(c)
+    legend = [f"{i}" for i in range(1, 6 + 1)]
+    plt.bar(legend, loss)
+    plt.show()
+
+
+if __name__ == "__main__":
+    main()
