@@ -16,10 +16,15 @@ def minmax(x):
     x = x.reshape(-1, 1)  # array
     try:
         # x(i) - min(x) / max(x) - min(x)
-        mandm = (x - x.min()) / (x.max() - x.min())
+        min_ = np.min(x)
+        max_ = np.max(x)
+        span = max_ - min_
+        res = np.zeros(x.shape)
+        for i in range(x.size):
+            res[i] = (x[i] - min_) / span
     except (TypeError, np.core._exceptions.UFuncTypeError):
         return None
-    return mandm
+    return res
 
 
 # Example 1:

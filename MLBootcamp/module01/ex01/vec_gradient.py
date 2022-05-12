@@ -1,5 +1,27 @@
 import numpy as np
-from tools import add_intercept as tool
+
+
+def add_intercept(x):
+    """Adds a column of 1’s to the non-empty numpy.array x.
+    Args:
+    x: has to be an numpy.array, a vector of shape m * 1.
+    Returns:
+    x as a numpy.array, a vector of shape m * 2.
+    None if x is not a numpy.array.
+    None if x is a empty numpy.array.
+    Raises:
+    This function should not raise any Exception"""
+    if not isinstance(x, np.ndarray):
+        return None
+    if len(x.shape) != 2 or x.shape[1] != 1:
+        return None
+    try:
+        if len(x.shape) == 1:
+            x = x.reshape((x.shape[0], 1))
+        i = np.ones((x.shape[0], 1))
+        return np.append(i, x, axis=1)
+    except ValueError:
+        return None
 
 
 def gradient(x, y, theta):
@@ -23,21 +45,67 @@ def gradient(x, y, theta):
     if x.shape[1] != 1 or y.shape[1] != 1 or theta.shape != (2, 1):
         return None
     try:
-        x = tool(x)
-        parenthesis = np.subtract(x.dot(theta), y)
-        coef = x.dot(1/x.shape[0])
+        m = x.shape[0]
+        x = add_intercept(x)
+        res = x.T.dot(x.dot(theta) - y)
     except (np.core._exceptions.UFuncTypeError, TypeError, ValueError):
         return None
-    return np.transpose(coef).dot(parenthesis)
+    return res / m
 
 
-x = np.array([[12.4956442], [21.5007972], [
-             31.5527382], [48.9145838], [57.5088733]])
-y = np.array([[37.4013816], [36.1473236], [
-             45.7655287], [46.6793434], [59.5585554]])
+if __name__ == "__main__":
+    x = np.array([[12.4956442], [21.5007972], [
+                 31.5527382], [48.9145838], [57.5088733]])
+    y = np.array([[37.4013816], [36.1473236], [
+                 45.7655287], [46.6793434], [59.5585554]])
 
-theta1 = np.array([[2], [0.7]])
-print(gradient(x, y, theta1))
+    theta1 = np.array([[2], [0.7]])
+    print(gradient(x, y, theta1))
 
-theta2 = np.array([[1], [-0.4]])
-print(gradient(x, y, theta2))
+    theta2 = np.array([[1], [-0.4]])
+    print(gradient(x, y, theta2))
+
+    x = np.array([12.4956442, 21.5007972, 31.5527382,
+                 48.9145838, 57.5088733]).reshape((-1, 1))
+    y = np.array([37.4013816, 36.1473236, 45.7655287,
+                 46.6793434, 59.5585554]).reshape((-1, 1))
+    print("# Example 0:")
+    theta1 = np.array([2, 0.7]).reshape((-1, 1))
+    print(gradient(x, y, theta1))
+    # print(np.gradient(predict_(x, theta1), y))
+    # Output:
+    print("array([[-19.0342574], [-586.66875564]])")
+    print()
+
+    print("# Example 1:")
+    theta2 = np.array([1, -0.4]).reshape((-1, 1))
+    print(gradient(x, y, theta2))
+    # Output:
+    print("array([[-57.86823748], [-2230.12297889]])")
+
+    def unit_test(n, theta, answer, f):
+        x = np.array(range(1, n+1)).reshape((-1, 1))
+        y = f(x)
+        print(f"Student:\n{gradient(x, y, theta)}")
+        print(f"Truth  :\n{answer}")
+        print()
+
+    theta = np.array([[1.], [1.]])
+    answer = np.array([[-11.625], [-795.375]])
+    unit_test(100, theta, answer, lambda x: 1.25 * x)
+
+    answer = np.array([[-124.125], [-82957.875]])
+    unit_test(1000, theta, answer, lambda x: 1.25 * x)
+
+    answer = np.array([[-1.24912500e+03], [-8.32958288e+06]])
+    unit_test(10000, theta, answer, lambda x: 1.25 * x)
+
+    theta = np.array([[4], [-1]])
+    answer = np.array([[-13.625], [-896.375]])
+    unit_test(100, theta, answer, lambda x: -0.75 * x + 5)
+
+    answer = np.array([[-126.125], [-83958.875]])
+    unit_test(1000, theta, answer, lambda x: -0.75 * x + 5)
+
+    answer = np.array([[-1.25112500e+03], [-8.33958388e+06]])
+    unit_test(10000, theta, answer, lambda x: -0.75 * x + 5)
