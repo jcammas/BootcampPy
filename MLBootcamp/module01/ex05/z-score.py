@@ -1,5 +1,7 @@
 import numpy as np
 
+# scaling the data
+
 
 def zscore(x: np.ndarray) -> np.ndarray:
     """Computes the normalized version of a non-empty numpy.array using the z-score standardization.

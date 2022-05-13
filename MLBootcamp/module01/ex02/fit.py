@@ -65,12 +65,12 @@ def gradient(x, y, theta):
     if x.shape[1] != 1 or y.shape[1] != 1 or theta.shape != (2, 1):
         return None
     try:
+        m = x.shape[0]
         x = add_intercept(x)
-        parenthesis = np.subtract(x.dot(theta), y)
-        coef = x.dot(1/x.shape[0])
+        res = x.T.dot(x.dot(theta) - y)
     except (np.core._exceptions.UFuncTypeError, TypeError, ValueError):
         return None
-    return np.transpose(coef).dot(parenthesis)
+    return res / m
 
 
 def fit_(theta, x, y, alpha=0.001, max_iter=10000):
@@ -97,18 +97,71 @@ def fit_(theta, x, y, alpha=0.001, max_iter=10000):
         return None
     if max_iter <= 0:
         return None
-    for i in range(max_iter):
-        g = gradient(x, y, theta)
-        theta = theta - (alpha * g)
+    theta = theta.astype("float64")
+    while max_iter > 0:
+        # repeat until convergence: {
+        #      compute ∇(J)
+        #      θ0 := θ0 − α∇(J)0
+        #      θ1 := θ1 − α∇(J)1
+        #  }
+        #  Where:
+        #     • α (alpha) is the learning rate. It’s a small float number (usually between 0 and 1),
+        #     • For now, "reapeat until convergence" will mean to simply repeat for max_iter (a
+        #       number that you will choose wisely)
+        new_theta = gradient(x, y, theta)
+        theta[0][0] -= alpha * new_theta[0][0]
+        theta[1][0] -= alpha * new_theta[1][0]
+        max_iter -= 1
     return theta
 
 
-x = np.array([[12.4956442], [21.5007972], [
-             31.5527382], [48.9145838], [57.5088733]])
-y = np.array([[37.4013816], [36.1473236], [
-             45.7655287], [46.6793434], [59.5585554]])
-theta1 = np.array([[1], [1]])
-theta1 = fit_(theta1, x, y, alpha=5e-6, max_iter=15000)
-print(theta1)
-print("\n\n")
-print(predict_(x, theta1))
+if __name__ == "__main__":
+
+    x = np.array([[12.4956442], [21.5007972], [
+        31.5527382], [48.9145838], [57.5088733]])
+    y = np.array([[37.4013816], [36.1473236], [
+        45.7655287], [46.6793434], [59.5585554]])
+    theta1 = np.array([[1], [1]])
+    theta1 = fit_(theta1, x, y, alpha=5e-6, max_iter=15000)
+    print(theta1)
+    print("\n\n")
+    print(predict_(x, theta1))
+
+    x = np.array([[12.4956442], [21.5007972], [
+                 31.5527382], [48.9145838], [57.5088733]])
+    y = np.array([[37.4013816], [36.1473236], [
+                 45.7655287], [46.6793434], [59.5585554]])
+    theta = np.array([[1], [1]])
+    print("# Example 0:")
+    theta1 = fit_(x, y, theta, alpha=5e-8, max_iter=1500000)
+    print(theta1)
+    # Output:
+    print("""
+    array([[1.40709365],
+    [1.1150909 ]])
+    """)
+    print()
+
+    print("# Example 1:")
+    print(predict_(x, theta1))
+    # Output:
+    print("""
+    array([[15.3408728 ],
+    [25.38243697],
+    [36.59126492],
+    [55.95130097],
+    [65.53471499]])
+    """)
+
+    x = np.array(range(1, 101)).reshape(-1, 1)
+    y = 0.75*x + 5
+    theta = np.array([[1.], [1.]])
+    print(fit_(x, y, theta, 5e-4, 20000))
+    print("[[4.03112103], [0.76446193]]")
+
+    # - with x = np.array(range(1,101)).reshape(-1,1),
+    # y = 0.75*x + 5 and
+    # theta = np.array([[1.],[1.]])
+    # fit_(x, y, theta, 1e-5, 2000)
+    # should return a result close to
+    # [[4.03112103], [0.76446193]].

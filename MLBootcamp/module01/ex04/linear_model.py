@@ -13,6 +13,13 @@ class MyLinearRegression():
         self.max_iter = max_iter
         self.theta = theta
 
+    @staticmethod
+    def mse_(y: np.ndarray, y_hat: np.ndarray) -> float:
+        if y.shape != y_hat.shape:
+            return None
+        mse_elem = (y_hat - y) ** 2 / (y.shape[0])
+        return np.sum(mse_elem)
+
     def loss_elem_(self, y: np.ndarray, y_hat: np.ndarray) -> np.ndarray:
         if len(y) == 0 or len(y_hat) == 0:
             return None
@@ -30,16 +37,6 @@ class MyLinearRegression():
             return np.sum(self.loss_elem_(y, y_hat)) / 10
         except (np.core._exceptions.UFuncTypeError, TypeError):
             return None
-
-    def mse_(self, y, y_hat):
-        if not isinstance(y, np.ndarray) or not isinstance(y_hat, np.ndarray):
-            return None
-        if len(y) == 0 or len(y_hat) == 0 or y.shape != y_hat.shape or y.shape[1] != 1 or y_hat.shape[1] != 1:
-            return None
-        summed = 0.0
-        for yi, yi_hat in zip(y, y_hat):
-            summed += (yi - yi_hat) ** 2
-        return summed/y.size
 
     def add_intercept(self, x):
         if type(x) is not np.ndarray or len(x) == 0:
@@ -77,12 +74,12 @@ class MyLinearRegression():
         if x.shape[1] != 1 or y.shape[1] != 1 or self.theta.shape != (2, 1):
             return None
         try:
+            m = x.shape[0]
             x = self.add_intercept(x)
-            parenthesis = np.subtract(x.dot(self.theta), y)
-            coef = x.dot(1/x.shape[0])
+            res = x.T.dot(x.dot(self.theta) - y)
         except (np.core._exceptions.UFuncTypeError, TypeError, ValueError):
             return None
-        return np.transpose(coef).dot(parenthesis)
+        return res / m
 
     def fit_(self, x: np.ndarray, y: np.ndarray) -> None:
         if self.theta.ndim != 2 or x.ndim != 2 or self.theta.shape[1] != 1 or x.shape[1] + 1 != self.theta.shape[0] or y.shape[0] != x.shape[0]:
@@ -91,9 +88,21 @@ class MyLinearRegression():
             return None
         if x.shape[1] != 1 or y.shape[1] != 1 or self.theta.shape != (2, 1):
             return None
-        for i in range(self.max_iter):
-            g = self.gradient(x, y)
-            self.theta = self.theta - (self.alpha * g)
+        while self.max_iter > 0:
+            # repeat until convergence: {
+            #      compute ∇(J)
+            #      θ0 := θ0 − α∇(J)0
+            #      θ1 := θ1 − α∇(J)1
+            #  }
+            #  Where:
+            #     • α (alpha) is the learning rate. It’s a small float number (usually between 0 and 1),
+            #     • For now, "reapeat until convergence" will mean to simply repeat for max_iter (a
+            #       number that you will choose wisely)
+            new_theta = self.gradient(x, y)
+            self.theta[0][0] -= self.alpha * new_theta[0][0]
+            self.theta[1][0] -= self.alpha * new_theta[1][0]
+            self.max_iter -= 1
+        return self.theta
 
 
 def draw_regression(x, y, MyLinearRegression):
@@ -107,26 +116,39 @@ def draw_regression(x, y, MyLinearRegression):
     plt.show()
 
 
-def draw_cost_function(x, y):
-    plt.ylim((10, 50))
-    plt.xlim((-14, -4))
-    ran = 15
-    upd = ran * 2 / 6
-    for t0 in np.arange(89 - ran, 89 + ran, upd):
-        cost_list = []
-        theta_list = []
-        for t1 in np.arange(-80 - 100, -8 + 100, 0.1):
-            lr = MyLinearRegression(theta=[t0, t1], alpha=1e-3, max_iter=50000)
-            y_ = lr.predict_(x)
-            mse_c = lr.loss_(y, y_)
-            cost_list.append(mse_c)
-            theta_list.append(t1)
-        label = "θ[0]=" + str(int(t0 * 10) / 10)
-        plt.plot(theta_list, cost_list, label=label)
-    plt.xlabel("Theta1")
-    plt.ylabel("Cost function J(Theta0, Theta1)")
+def plot_cost(x: np.ndarray, y: np.ndarray) -> None:
+    plt.xlabel("$θ_1$")
+    plt.ylabel("cost function $J(θ_0, θ_1)$")
+    plt.grid()
+
+    linear_model = MyLinearRegression(np.array([[0], [0]]), max_iter=500)
+    thetas_0 = range(85, 95, 2)
+    for t0 in thetas_0:
+        linear_model.theta[0][0] = t0
+
+        npoints = 100
+        y_cost = [0] * npoints
+        thetas1 = np.linspace(-15, -3.8, npoints)
+        for i, t1 in enumerate(thetas1):
+            linear_model.theta[1][0] = t1
+            y_hat = linear_model.predict_(x)
+            y_cost[i] = linear_model.loss_(y, y_hat)
+        plt.plot(thetas1, y_cost, label="$J(θ_0=%d, θ_1)$" % t0)
+
+    plt.legend()
     plt.show()
-    plt.cla()
+
+
+def plot2graphs(x: np.ndarray, y: np.ndarray) -> None:
+    linear_model = MyLinearRegression(np.array([[89.0], [-8]]), max_iter=500)
+
+    flag = 3
+    if flag & 1:
+        linear_model.fit_(x, y)
+        y_hat = linear_model.predict_(x)
+        draw_regression(x, y, y_hat)
+    if flag & 2:
+        plot_cost(x, y)
 
 
 data = pd.read_csv("../resources/are_blue_pills_magics.csv")
@@ -148,4 +170,4 @@ print("sklearn =>", mean_squared_error(Yscore, Y_model2))
 
 
 draw_regression(Xpill, Yscore, linear_model1)
-draw_cost_function(Xpill, Yscore)
+plot_cost(Xpill, Yscore)

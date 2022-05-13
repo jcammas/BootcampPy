@@ -18,10 +18,10 @@ def minmax(x):
         # x(i) - min(x) / max(x) - min(x)
         min_ = np.min(x)
         max_ = np.max(x)
-        span = max_ - min_
+        diff = max_ - min_
         res = np.zeros(x.shape)
         for i in range(x.size):
-            res[i] = (x[i] - min_) / span
+            res[i] = (x[i] - min_) / diff
     except (TypeError, np.core._exceptions.UFuncTypeError):
         return None
     return res

@@ -64,12 +64,12 @@ class MyLinearRegression():
         if x.shape[1] != 1 or y.shape[1] != 1 or self.theta.shape != (2, 1):
             return None
         try:
+            m = x.shape[0]
             x = self.add_intercept(x)
-            parenthesis = np.subtract(x.dot(self.theta), y)
-            coef = x.dot(1/x.shape[0])
+            res = x.T.dot(x.dot(self.theta) - y)
         except (np.core._exceptions.UFuncTypeError, TypeError, ValueError):
             return None
-        return np.transpose(coef).dot(parenthesis)
+        return res / m
 
     def fit_(self, x: np.ndarray, y: np.ndarray) -> None:
         if self.theta.ndim != 2 or x.ndim != 2 or self.theta.shape[1] != 1 or x.shape[1] + 1 != self.theta.shape[0] or y.shape[0] != x.shape[0]:
@@ -78,9 +78,21 @@ class MyLinearRegression():
             return None
         if x.shape[1] != 1 or y.shape[1] != 1 or self.theta.shape != (2, 1):
             return None
-        for i in range(self.max_iter):
-            g = self.gradient(x, y)
-            self.theta = self.theta - (self.alpha * g)
+        while self.max_iter > 0:
+            # repeat until convergence: {
+            #      compute ∇(J)
+            #      θ0 := θ0 − α∇(J)0
+            #      θ1 := θ1 − α∇(J)1
+            #  }
+            #  Where:
+            #     • α (alpha) is the learning rate. It’s a small float number (usually between 0 and 1),
+            #     • For now, "reapeat until convergence" will mean to simply repeat for max_iter (a
+            #       number that you will choose wisely)
+            new_theta = self.gradient(x, y)
+            self.theta[0][0] -= self.alpha * new_theta[0][0]
+            self.theta[1][0] -= self.alpha * new_theta[1][0]
+            self.max_iter -= 1
+        return self.theta
 
 
 if __name__ == "__main__":

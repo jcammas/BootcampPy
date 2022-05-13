@@ -1,6 +1,11 @@
 import numpy as np
 
 
+# with gradient calcul, we want to improve our model
+# But how to get closer to the minimum? (in order to have the minimul loss we can)
+# which direction =>  If the slope is positive, θ1 must be decreased. If the slope is negative, it must be increased
+
+
 def add_intercept(x):
     """Adds a column of 1’s to the non-empty numpy.array x.
     Args:
@@ -16,10 +21,10 @@ def add_intercept(x):
     if len(x.shape) != 2 or x.shape[1] != 1:
         return None
     try:
-        if len(x.shape) == 1:
-            x = x.reshape((x.shape[0], 1))
-        i = np.ones((x.shape[0], 1))
-        return np.append(i, x, axis=1)
+        shape = (x.shape[0], 1)
+        ones = np.full(shape, 1)
+        res = np.concatenate((ones, x), axis=1)
+        return res
     except:
         return None
 
@@ -61,6 +66,18 @@ def simple_gradient(x, y, theta):
 
 
 if __name__ == "__main__":
+    x = np.array([[12.4956442], [21.5007972], [
+                 31.5527382], [48.9145838], [57.5088733]])
+    y = np.array([[37.4013816], [36.1473236], [
+                 45.7655287], [46.6793434], [59.5585554]])
+    # Example 0:
+    theta1 = np.array([[2], [0.7]])
+    print(simple_gradient(x, y, theta1))
+
+    # Example 1:
+    theta2 = np.array([[1], [-0.4]])
+    print(simple_gradient(x, y, theta2))
+
     x = np.array([[12.4956442], [21.5007972], [
         31.5527382], [48.9145838], [57.5088733]])
     y = np.array([[37.4013816], [36.1473236], [
