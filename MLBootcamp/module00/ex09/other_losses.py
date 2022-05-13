@@ -4,6 +4,18 @@ from math import sqrt
 
 
 def mse_(y, y_hat):
+    """
+    Description:
+    Calculate the MSE between the predicted output and the real output.
+    Args:
+    y: has to be a numpy.array, a vector of shape m * 1.
+    y_hat: has to be a numpy.array, a vector of shape m * 1.
+    Returns:
+    mse: has to be a float.
+    None if there is a matching shape problem.
+    Raises:
+    This function should not raise any Exception.
+    """
     if not isinstance(y, np.ndarray) or not isinstance(y_hat, np.ndarray):
         return None
     if len(y) == 0 or len(y_hat) == 0 or y.shape != y_hat.shape or y.shape[1] != 1 or y_hat.shape[1] != 1:
@@ -15,6 +27,18 @@ def mse_(y, y_hat):
 
 
 def rmse_(y, y_hat):
+    """
+    Description:
+    Calculate the RMSE between the predicted output and the real output.
+    Args:
+    y: has to be a numpy.array, a vector of shape m * 1.
+    y_hat: has to be a numpy.array, a vector of shape m * 1.
+    Returns:
+    rmse: has to be a float.
+    None if there is a matching shape problem.
+    Raises:
+    This function should not raise any Exception.
+    """
     if not isinstance(y, np.ndarray) or not isinstance(y_hat, np.ndarray):
         return None
     if len(y) == 0 or len(y_hat) == 0 or y.shape != y_hat.shape or y.shape[1] != 1 or y_hat.shape[1] != 1:
@@ -34,6 +58,18 @@ def dot(x, y):
 
 
 def mae_(y, y_hat):
+    """
+    Description:
+    Calculate the MAE between the predicted output and the real output.
+    Args:
+    y: has to be a numpy.array, a vector of shape m * 1.
+    y_hat: has to be a numpy.array, a vector of shape m * 1.
+    Returns:
+    mae: has to be a float.
+    None if there is a matching shape problem.
+    Raises:
+    This function should not raise any Exception.
+    """
     if not isinstance(y, np.ndarray) or not isinstance(y_hat, np.ndarray):
         return None
     if len(y) == 0 or len(y_hat) == 0 or y.shape != y_hat.shape or y.shape[1] != 1 or y_hat.shape[1] != 1:
@@ -42,6 +78,18 @@ def mae_(y, y_hat):
 
 
 def r2score_(y, y_hat):
+    """
+    Description:
+    Calculate the R2score between the predicted output and the output.
+    Args:
+    y: has to be a numpy.array, a vector of shape m * 1.
+    y_hat: has to be a numpy.array, a vector of shape m * 1.
+    Returns:
+    r2score: has to be a float.
+    None if there is a matching shape problem.
+    Raises:
+    This function should not raise any Exception.
+    """
     if not isinstance(y, np.ndarray) or not isinstance(y_hat, np.ndarray):
         return None
     if len(y) == 0 or len(y_hat) == 0 or y.shape != y_hat.shape or y.shape[1] != 1 or y_hat.shape[1] != 1:

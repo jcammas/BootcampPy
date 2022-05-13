@@ -1,5 +1,20 @@
 import numpy as np
 
+# A computer program is said to learn from experience E, with respect to some class of
+# tasks T, and performance measure P, if its performance at tasks in T, as measured by P,
+# improves with experience E
+# In other words to learn you have to improve.
+# To improve you have to evaluate your performance.
+# To evaluate your performance you need to start performing on the task you want to be
+# good at.
+
+# here we want to model some data :
+#     - First we need to make an assumption, or hypothesis, about the structure of the data
+#       and the relationship between the variables.
+#     - Then we can apply that hypothesis to our data to make predictions => hypothesis(data) = predictions
+
+# en gros on va appliquer la formule y_hat = ax + b pour avoir un 1er jet de ce qu'on aura avec nos données
+
 
 def simple_predict(X, theta):
     """Computes the vector of prediction y_hat from two non-empty numpy.array.
