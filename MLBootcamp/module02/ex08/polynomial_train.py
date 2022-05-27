@@ -175,36 +175,30 @@ def add_polynomial_features(x, power):
     return res
 
 
-def continuous_plot(x, y, i, lr):
-    continuous_x = np.arange(1, 10.01, 0.01).reshape(-1, 1)
-    x_ = add_polynomial_features(continuous_x, i)
-    y_hat = lr.predict_(x_)
-    plt.scatter(x.T[0], y)
-    plt.plot(continuous_x, y_hat, color='orange')
-    plt.show()
-
-
-def polynomial_train(feature, target, nbrFit):
-    x = add_polynomial_features(feature, nbrFit)
-    if nbrFit == 4:
-        theta = [-20, 160, -80, 10, -1]
-    elif nbrFit == 5:
-        theta = [1140, -1850, 1110, -305, 40, -2]
-    elif nbrFit == 6:
-        theta = [9110, -18015, 13400, -4935, 966, -96.4, 3.86]
+def polynomial_train(feature, target, i):
+    x = add_polynomial_features(feature, i)
+    # You will not be able to get acceptable parameters for models 4, 5 and 6. Thus you can
+    # start the fit process for those models with:
+    # theta4 = np.array([[-20],[ 160],[ -80],[ 10],[ -1]]).reshape(-1,1)
+    # theta5 = np.array([[1140],[ -1850],[ 1110],[ -305],[ 40],[ -2]]).reshape(-1,1)
+    # theta6 = np.array([[9110],[ -18015],[ 13400],[ -4935],[ 966],[ -96.4],[ 3.86]]).reshape(-1,1)
+    if i == 4:
+        thetas = [-20, 160, -80, 10, -1]
+    elif i == 5:
+        thetas = [1140, -1850, 1110, -305, 40, -2]
+    elif i == 6:
+        thetas = [9110, -18015, 13400, -4935, 966, -96.4, 3.86]
     else:
-        theta = [1] * (x.shape[1] + 1)
-
-    if nbrFit == 5:
+        thetas = [1] * (x.shape[1] + 1)
+    if i == 5:
         alpha = 1e-8
-    elif nbrFit == 6:
+    elif i == 6:
         alpha = 1e-9
     else:
-        alpha = 1 / (100 * (10 ** nbrFit))
+        alpha = 1 / (100 * (10 ** i))
 
-    lr = MyLinearRegression(thetas=theta, alpha=alpha, max_iter=50000)
+    lr = MyLinearRegression(thetas=thetas, alpha=alpha, max_iter=50000)
     lr.fit_(x, target)
-    continuous_plot(x, target, nbrFit, lr)
     loss = lr.loss_(target, lr.predict_(x))
     print(f"{loss = }")
     return loss
@@ -212,13 +206,18 @@ def polynomial_train(feature, target, nbrFit):
 
 def main():
     data = pd.read_csv("../resources/are_blue_pills_magics.csv")
+    # Check the student used 'Micrograms' as feature (x) and 'Score' as target (y).
     feature = np.array(data["Micrograms"]).reshape(-1, 1)
     target = np.array(data["Score"]).reshape(-1, 1)
 
     loss = []
-    for i in range(1, 6 + 1):
+    # Verify the program performs the 6 linear regressions with polynomial models
+    # where the degree are ranging from 1 to 6.
+    for i in range(1, 10):
         c = polynomial_train(feature, target, i)
         loss.append(c)
+        if i == 6:
+            break
     legend = [f"{i}" for i in range(1, 6 + 1)]
     plt.bar(legend, loss)
     plt.show()
