@@ -1,6 +1,9 @@
 import numpy as np
 
 
+# the multivariate hypothesis can be vectorized as well.
+# The idea here is to add a column of 1's a the first column of the X matrix => then you can calculate easily because the dimension are the same and 1 does not affect any calcul
+
 def add_intercept(x: np.ndarray, axis: int = 1) -> np.ndarray:
     """Adds a column of 1's to the non-empty numpy.ndarray x.
     Args:
@@ -38,6 +41,7 @@ def predict_(x, theta):
             len(theta.shape) != 2 or theta.shape[1] != 1 or theta.shape[0] <= 1:
         return None
     try:
+        # θ0x(i)0 + θ1x(i)1 + · · · + θnx(i)n = θ · x0(i)
         t = add_intercept(x)
         y_hat = t.dot(theta)
     except (ValueError, np.core._exceptions.UFuncTypeError):
@@ -65,19 +69,11 @@ print("Test 1")
 x = (np.arange(1, 13)).reshape(-1, 2)
 theta = np.ones(3).reshape(-1, 1)
 print(predict_(x, theta))
-print("array([[ 4.], [ 8.], [12.], [16.], [20.], [24.]])")
-print()
-
 print("Test 2")
 x = (np.arange(1, 13)).reshape(-1, 3)
 theta = np.ones(4).reshape(-1, 1)
 print(predict_(x, theta))
-print("array([[ 7.], [16.], [25.], [34.]])")
-print()
-
 print("Test 3")
 x = (np.arange(1, 13)).reshape(-1, 4)
 theta = np.ones(5).reshape(-1, 1)
 print(predict_(x, theta))
-print("array([[11.], [27.], [43.]])")
-print()

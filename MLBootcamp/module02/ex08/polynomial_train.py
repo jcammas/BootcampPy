@@ -150,6 +150,17 @@ class MyLinearRegression():
         self.thetas = theta
 
 
+def continuous_plot(x, y, i, lr):
+    # Build the model:
+    # Plot:
+    continuous_x = np.arange(1, 7.01, 0.01).reshape(-1, 1)
+    x_ = add_polynomial_features(continuous_x, i)
+    y_hat = lr.predict_(x_)
+    plt.scatter(x.T[0], y)
+    plt.plot(continuous_x, y_hat, color='orange')
+    plt.show()
+
+
 def add_polynomial_features(x, power):
     """Add polynomial features to vector x by raising its values up to the power given in argument.
     Args:
@@ -199,6 +210,7 @@ def polynomial_train(feature, target, i):
 
     lr = MyLinearRegression(thetas=thetas, alpha=alpha, max_iter=50000)
     lr.fit_(x, target)
+    continuous_plot(x, target, i, lr)
     loss = lr.loss_(target, lr.predict_(x))
     print(f"{loss = }")
     return loss

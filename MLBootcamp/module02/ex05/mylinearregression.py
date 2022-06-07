@@ -1,79 +1,148 @@
 import numpy as np
-import warnings
-import sys
-warnings.filterwarnings('ignore')
-
-ALLOWED_TYPES = [int, float, np.int64, np.float64]
 
 
 class MyLinearRegression():
+    """"""
 
-    def __init__(self, theta, alpha=0.001, n_cycle=2000):
-        if not MyLinearRegression.verif_params(theta):
-            sys.exit('Invalid theta param')
+    def __init__(self, thetas: np.ndarray, alpha: float = 0.001, max_iter: int = 1000):
+        if isinstance(thetas, list):
+            thetas = np.asarray(thetas).reshape(-1, 1)
+        thetas = thetas.astype("float64")
         self.alpha = alpha
-        self.n_cycle = n_cycle
-        self.theta = np.asarray(theta)
+        self.max_iter = max_iter
+        self.thetas = thetas
 
     @staticmethod
-    def verif_params(*args):
-        for arg in args:
-            if not isinstance(arg, list) and not isinstance(arg, np.ndarray):
-                return False
-            for val in arg:
-                if type(val) not in ALLOWED_TYPES:
-                    if isinstance(val, np.ndarray) or isinstance(val, list):
-                        try:
-                            tmp = val.sort()
-                            for v in val:
-                                if type(v) not in ALLOWED_TYPES:
-                                    return False
-                        except (np.core._exceptions.UFuncTypeError, TypeError, ValueError):
-                            return False
-                        continue
-                    else:
-                        return False
-        return True
-
-    def predict_(self, X):
-        if self.theta.ndim != 2 or X.ndim != 2 or self.theta.shape[1] != 1 or X.shape[1] + 1 != self.theta.shape[0]:
-            print("Incompatible dimension match between X and theta.")
+    def add_intercept(x: np.ndarray, axis: int = 1) -> np.ndarray:
+        """Adds a column of 1's to the non-empty numpy.ndarray x.
+        Args:
+            x: has to be an numpy.ndarray, a matrix of dimension m * n.
+        Returns:
+            X as a numpy.ndarray, a matrix of dimension m * (n + 1).
+            None if x is not a numpy.ndarray.
+            None if x is a empty numpy.ndarray.
+        Raises:
+            This function should not raise any Exception.
+        """
+        if not isinstance(x, np.ndarray) or x.size == 0:
             return None
-        if not MyLinearRegression.verif_params(X):
-            return None
-        X = np.insert(X, 0, 1., axis=1)
-        return X.dot(self.theta)
-
-    def loss_elem_(self, X, Y):
-        if not MyLinearRegression.verif_params(X, Y):
-            return None
-        Y_hat = self.predict_(X)
-        res = np.array([(Y - Y_hat) ** 2])
+        ones = np.ones((x.shape[0], 1))
+        res = np.concatenate((ones, x), axis=axis)
         return res
 
-    def loss_(self, X, Y):
-        if not MyLinearRegression.verif_params(X, Y):
+    @staticmethod
+    def loss_elem_(y: np.ndarray, y_hat: np.ndarray) -> np.ndarray:
+        """
+        Description:
+            Calculates all the elements (1/2*M)*(y_pred - y)^2 of the cost function.
+        Args:
+            y: has to be an numpy.ndarray, a vector.
+            y_hat: has to be an numpy.ndarray, a vector.
+        Returns:
+            J_elem: numpy.ndarray, a vector of dimension (number of the training examples,1).
+            None if there is a dimension matching problem between X, Y or theta.
+        Raises:
+            This function should not raise any Exception.
+        """
+        if len(y) == 0 or len(y_hat) == 0:
             return None
-        Y_hat = self.predict_(X)
-        if Y_hat is None:
+        try:
+            def loss_func(y, y_, m): return (y - y_) ** 2
+            res = np.array([loss_func(i, j, len(y)) for i, j in zip(y, y_hat)])
+            return res
+        except (np.core._exceptions.UFuncTypeError, TypeError, ValueError):
             return None
-        return np.sum((Y_hat - Y)**2)/(2*X.shape[0])
 
-    def fit_(self, X, Y):
-        if self.theta.ndim != 2 or X.ndim != 2 or self.theta.shape[1] != 1 or X.shape[1] + 1 != self.theta.shape[0] or Y.shape[0] != X.shape[0]:
-            print("Incompatible dimension match between X and theta.")
+    @staticmethod
+    def loss_(y: np.ndarray, y_hat: np.ndarray) -> float:
+        """Computes the half mean squared error of two non-empty numpy.ndarray,
+            without any for loop. The two arrays must have the same dimensions.
+        Args:
+            y: has to be an numpy.ndarray, a vector.
+            y_hat: has to be an numpy.ndarray, a vector.
+        Returns:
+            The half mean squared error of the two vectors as a float.
+            None if y or y_hat are empty numpy.ndarray.
+            None if y and y_hat does not share the same dimensions.
+        Raises:
+            This function should not raise any Exceptions.
+        """
+        if len(y) == 0:
             return None
-        if not MyLinearRegression.verif_params(X, Y):
+        try:
+            res = abs((1 / (2 * y.shape[0])) *
+                      (y_hat - y).T.dot(y - y_hat).sum())
+            return res
+        except (np.core._exceptions.UFuncTypeError, TypeError):
             return None
-        if len(X) == 0 or len(Y) == 0 or len(X.shape) != 2 or len(Y.shape) != 2:
+
+    def predict_(self, x: np.ndarray) -> np.ndarray:
+        """Computes the prediction vector y_hat from two non-empty numpy.ndarray.
+        Args:
+            x: has to be an numpy.ndarray, a matrix of dimension m * n.
+            theta: has to be an numpy.ndarray, a vector of dimension (n + 1) * 1.
+        Returns:
+            y_hat as a numpy.ndarray, a vector of dimension m * 1.
+            None if x or theta are empty numpy.ndarray.
+            None if x or theta dimensions are not appropriate.
+        Raises:
+            This function should not raise any Exception.
+        """
+        if not isinstance(x, np.ndarray):
             return None
-        if not isinstance(self.alpha, float) or not isinstance(self.n_cycle, int):
+        thetas = self.thetas
+        if (x.shape[1] + 1) != thetas.shape[0]:
             return None
-        m = X.shape[0]
-        X = np.insert(X, 0, 1., axis=1)
-        for i in range(self.n_cycle):
-            hypothesis = X.dot(self.theta)
-            parenthesis = np.subtract(hypothesis, Y)
-            sigma = np.sum(np.dot(X.T, parenthesis), keepdims=True, axis=1)
-            self.theta = self.theta - (self.alpha / m) * sigma
-        return self.theta
+        t = self.add_intercept(x)
+        y_hat = t.dot(thetas)
+        return y_hat
+
+    def gradient(self, x: np.ndarray, y: np.ndarray) -> np.ndarray:
+        """Computes a gradient vector from three non-empty numpy.ndarray,
+            without any for-loop. The three arrays must have the compatible dimensions.
+        Args:
+            x: has to be an numpy.ndarray, a matrix of dimension m * n.
+            y: has to be an numpy.ndarray, a vector of dimension m * 1.
+            theta: has to be an numpy.ndarray, a vector (n + 1) * 1.
+        Returns:
+            The gradient as a numpy.ndarray, a vector of dimensions n * 1,
+            containg the result of the formula for all j.
+            None if x, y, or theta are empty numpy.ndarray.
+            None if x, y and theta do not have compatible dimensions.
+        Raises:
+            This function should not raise any Exception.
+        """
+        tmp = (x.dot(self.thetas))
+        loss = tmp - y
+        res = (x.T.dot(loss)) / x.shape[0]
+        return res
+
+    def fit_(self, x: np.ndarray, y: np.ndarray) -> None:
+        """
+        Description:
+                Fits the model to the training dataset contained in x and y.
+        Args:
+                x: has to be a numpy.ndarray, a vector of dimension m * 1: (number of training
+                        examples, 1).
+                y: has to be a numpy.ndarray, a vector of dimension m * 1: (number of training
+                        examples, 1).
+                theta: has to be a numpy.ndarray, a vector of dimension 2 * 1.
+                alpha: has to be a float, the learning rate
+                max_iter: has to be an int, the number of iterations done during the gradient
+                        descent
+        Returns:
+                new_theta: numpy.ndarray, a vector of dimension 2 * 1.
+                None if there is a matching dimension problem.
+        Raises:
+                This function should not raise any Exception.
+        """
+        if not isinstance(x, np.ndarray):
+            return None
+        if not isinstance(y, np.ndarray):
+            return None
+        x_ = self.add_intercept(x)
+        for _ in range(self.max_iter):
+            swp = self.gradient(x_, y).sum(axis=1)
+            tmp = (swp * self.alpha).reshape((-1, 1))
+            self.thetas = self.thetas - tmp
+        return self.thetas

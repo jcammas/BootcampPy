@@ -2,7 +2,16 @@ import numpy as np
 
 
 # Petit rappel : La régression linéaire est une régression polynomiale de degré 1.
+# https://fr.wikipedia.org/wiki/Matrice_de_Vandermonde
 
+
+# the mtehod we use is called linear regression for a reason : the model generates all of its predictions on a straight line.
+# What if we do not have a linear relationship with the predicted variable ?
+# In this case, we can use polynomial features
+
+# First we get to do some feature engineering. We create new features by raising our initial
+# x feature to the power of 2, and then 3, 4... as far as we want to go. For each new feature
+# we need to create a new column in the dataset.
 
 def add_polynomial_features(x, power):
     """Add polynomial features to vector x by raising its values up to the power given in argument.
@@ -38,23 +47,24 @@ print(add_polynomial_features(x, 3))
 print(add_polynomial_features(x, 6))
 
 
-print("CORRECTION:")
+print("\nCORRECTION:")
+
 print("\nTest 1:")
 x1 = np.arange(1, 6).reshape(-1, 1)
 x1_poly = add_polynomial_features(x1, 5)
-print(f"{x1_poly = }")
+print(f"{x1_poly = }\n")
 
 
-print("\nTest 2:")
-x2 = np.arange(10, 40, 10).reshape(-1, 1)
-x2_poly = add_polynomial_features(x2, 5)
-print(f"{x2_poly = }")
+# print("\nTest 2:")
+# x2 = np.arange(10, 40, 10).reshape(-1, 1)
+# x2_poly = add_polynomial_features(x2, 5)
+# print(f"{x2_poly = }\n")
 
 
-print("\nTest 3:")
-x3 = np.arange(10, 40, 10).reshape(-1, 1)/10
-x3_poly = add_polynomial_features(x3, 3)
-print(f"{x3_poly = }")
+# print("\nTest 3:")
+# x3 = np.arange(10, 40, 10).reshape(-1, 1)/10
+# x3_poly = add_polynomial_features(x3, 3)
+# print(f"{x3_poly = }\n")
 
 
 # https://ledatascientist.com/regression-polynomiale-avec-python/#:~:text=La%20r%C3%A9gression%20polynomiale%20est%20une,est%20mod%C3%A9lis%C3%A9e%20comme%20un%20polyn%C3%B4me.

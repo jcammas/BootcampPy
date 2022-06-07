@@ -1,13 +1,10 @@
 import numpy as np
 
 
-def dot(x, y):
-    if x.size == 0 or y.size == 0 or x.shape != y.shape:
-        return None
-    dot_product = 0.0
-    for xi, yi in zip(x, y):
-        dot_product += (xi * yi) ** 0.5
-    return dot_product
+# How is our model doing ? We need to evaluate our model with a loss concept
+# The idea here is to defined the loss function as the average of the squared distances between each prediction and its expected value
+# original formula => J(θ) = 1/2 mXmi=1 (ˆy(i) − y(i))2
+# vectorized form => J(θ) = 1/2m(ˆy − y) · (ˆy − y)
 
 
 def loss_(y: np.ndarray, y_hat: np.ndarray) -> float:
@@ -24,12 +21,11 @@ def loss_(y: np.ndarray, y_hat: np.ndarray) -> float:
     Raises:
     This function should not raise any Exception.
     """
-    if not isinstance(y, np.ndarray) or not isinstance(y_hat, np.ndarray):
+    if y.shape != y_hat.shape:
         return None
-        # J(θ) = 1/2m(ˆy − y) · (ˆy − y)
-    loss = (1 / (2 * y.shape[0])) * (y_hat - y).T.dot(y_hat - y)
-    loss = -loss if loss < 0 else loss
-    return loss
+    # J(θ) = 1/2m * (ˆy − y) · (ˆy − y)
+    res = (1 / (2 * y.shape[0])) * (y_hat - y).T.dot(y_hat - y)
+    return np.sum(res)
 
 
 if __name__ == "__main__":

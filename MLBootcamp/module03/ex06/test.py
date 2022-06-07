@@ -4,50 +4,25 @@ from my_logistic_regression import MyLogisticRegression as MyLR
 if __name__ == "__main__":
     X = np.array([[1., 1., 2., 3.], [5., 8., 13., 21.], [3., 5., 9., 14.]])
     Y = np.array([[1], [0], [1]])
-    mylr = MyLR([2, 0.5, 7.1, -4.3, 2.09], max_iter=int(2e4))
+    mylr = MyLR([2, 0.5, 7.1, -4.3, 2.09])
 
     # Example 0:
-    Y_HAT = mylr.logistic_predict_(X)
-    print(Y_HAT)
-    # Output:
-    """
-    array([[0.99930437],
-           [1.        ],
-           [1.        ]])
-    """
+    print(mylr.predict_(X))
+    print()
 
     # Example 1:
-    print(mylr.log_loss_(Y, Y_HAT))
-    # Output:
-    """
-    11.513157421577004
-    """
+    print(mylr.loss_(Y, (mylr.predict_(X))))
+    print()
 
     # Example 2:
     mylr.fit_(X, Y)
     print(mylr.theta)
-    # Output:
-    """
-    [[ 4.81201635]
-     [-1.32965333]
-     [ 4.4887675 ]
-     [-3.34153966]
-     [ 0.43722784]]
-    """
+    print()
 
     # Example 3:
-    Y_HAT = mylr.logistic_predict_(X)
-    print(Y_HAT)
-    # Output:
-    """
-    [[0.9308445 ]
-     [0.45404475]
-     [0.33497398]]
-    """
+    print(mylr.predict_(X))
+    print()
 
     # Example 4:
-    print(mylr.log_loss_(Y, Y_HAT))
-    # Output:
-    """
-    0.590194577934653
-    """
+    print(mylr.loss_(Y, (mylr.predict_(X))))
+    print()

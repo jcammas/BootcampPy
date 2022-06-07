@@ -1,11 +1,12 @@
 import pandas as pd
+from my_linear_regression import MyLinearRegression
 import pickle
 import os
 import numpy as np
 import matplotlib.pyplot as plt
 
 
-class Minmax():
+class utils():
     def __init__(self):
         self.min = 0.
         self.max = 0.
@@ -45,76 +46,57 @@ def add_polynomial_features(x, power):
     return res
 
 
-def model_load(poly):
+def model_load():
     """In models.[csv/yml/pickle] one must find the parameters of all the
     models you have explored and trained. In space_avocado.py train the model based on
     the best hypothesis you find and load the other models from models.[csv/yml/pickle].
     Then evaluate and plot the different graphics as asked before.
     https://www.journaldev.com/15638/python-pickle-example
     '"""
-    path = os.path.join(os.path.dirname(__file__), f"model_{poly}.pkl")
+    path = os.path.join(os.path.dirname(__file__), f"model_4.yml")
     with open(path, 'rb') as f:
         data = pickle.load(f)
     return data
 
 
-def multi_scatter(X, pred_price, true_price, costs):
-    plot_dim = 2
-    fig, axs_ = plt.subplots(plot_dim, plot_dim)
-    axs = []
-    for sublist in axs_:
-        for item in sublist:
-            axs.append(item)
+def plot_model(X, predicted_price, avocado_price, loss):
+    """"
+    plot our model in order to materialize our data
+    https://towardsdatascience.com/visualizing-data-with-pair-plots-in-python-f228cf529166"""
 
-    for idx_feature, feature in enumerate(X.T):
-        for idx_pred, y_hat in enumerate(pred_price):
-            c = ['r', 'y', 'm', 'b']
-            color = c[idx_pred]
-            axs[idx_feature].scatter(
-                feature, y_hat, s=.1, c=color, label=f"Poly {idx_pred}")
-        axs[idx_feature].scatter(
-            feature, true_price, s=0.1, c='g', label="True")
-        axs[idx_feature].legend()
+    ax = plt.figure().add_subplot(projection='3d')
 
-    legend = [f"Pol {i}" for i in range(1, len(costs) + 1)]
-    axs[-1].bar(legend, costs)
-    plt.show()
-
-    fig = plt.figure()
-    ax = fig.add_subplot(projection='3d')
-
-    ms = ["v", "^", "<", ">"]
-    c = ['r', 'y', 'm', 'b']
-
-    ax.scatter(X[:, 1], X[:, 2], true_price, marker="o", c="g", label="True")
-    for idx_pred, y_hat in enumerate(pred_price):
-        ax.scatter(X[:, 1], X[:, 2], y_hat, marker=ms[idx_pred],
-                   c=c[idx_pred], label=f"Poly {idx_pred}")
+    ax.scatter(X[:, 1], X[:, 2], avocado_price,
+               marker="*", c="g", label="Avocado price")
+    for i, y_hat in enumerate(predicted_price):
+        ax.scatter(X[:, 1], X[:, 2], y_hat, marker=["o", "s", "+", "*"][i],
+                   c=['r', 'y', 'm', 'b'][i], label=f"model {i}")
     ax.legend()
     plt.show()
 
 
 if __name__ == "__main__":
-    data = pd.read_csv("../resources/space_avocado.csv")
+    df = pd.read_csv("../resources/space_avocado.csv")
 
     X = np.array(
-        data[["weight", "prod_distance", "time_delivery"]]).reshape(-1, 3)
-    Y = np.array(data["target"]).reshape(-1, 1)
+        df[["weight", "prod_distance", "time_delivery"]]).reshape(-1, 3)
+    Y = np.array(df["target"]).reshape(-1, 1)
 
-    std_X = Minmax()
+    std_X = utils()
     std_X.fit(X)
     X_ = std_X.apply(X)
 
-    loss = []
-    prd = []
-    for i in range(1, 5):
-        print(f"{i}")
-        X_poly = add_polynomial_features(X_, i)
-        lr = model_load(i)
-        y_hat = lr.predict(X_poly)
-        cost = lr.cost_(Y, y_hat)
-        print(f"{cost = }")
-        loss.append(cost)
-        prd.append(y_hat)
+    costs = []
+    preds = []
+    X_model = add_polynomial_features(X_, 4)
 
-    multi_scatter(X, prd, Y, loss)
+    lr = model_load()
+    lr.predict_(X_model)
+
+    y_hat = lr.predict_(X_model)
+    cost = lr.loss_(Y, y_hat)
+    print(f"{cost = }")
+    costs.append(cost)
+    preds.append(y_hat)
+
+    plot_model(X, preds, Y, costs)

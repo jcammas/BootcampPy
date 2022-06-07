@@ -1,12 +1,13 @@
-# https://scikit-learn.org/stable/modules/generated/sklearn.linear_model.LogisticRegression.html
-
 import numpy as np
 
 
 class MyLogisticRegression():
-    """Description: My personal logistic regression to classify things"""
+    """
+    Description:
+        My personnal logistic regression to classify things.
+    """
 
-    def __init__(self, theta: np.ndarray, alpha=0.001, max_iter=1000) -> None:
+    def __init__(self, theta: np.ndarray, alpha: float = 1e-3, max_iter: int = 1000):
         if isinstance(theta, list):
             theta = np.asarray(theta).reshape(-1, 1)
         theta = theta.astype("float64")
@@ -15,48 +16,26 @@ class MyLogisticRegression():
         self.theta = theta
 
     @staticmethod
-    def log_loss_(y, y_hat, eps=1e-15):
+    def loss_(y: np.ndarray, y_hat: np.ndarray, eps: float = 1e-15) -> float:
         """
         Computes the logistic loss value.
         Args:
-        y: has to be an numpy.array, a vector of shape m * 1.
-        y_hat: has to be an numpy.array, a vector of shape m * 1.
-        eps: has to be a float, epsilon (default=1e-15)
-        Return:
-        The logistic loss value as a float.
-        None otherwise.
-        Raises:
-        This function should not raise any Exception.
-        """
-        if isinstance(y, (int, float)) == True:
-            y = [float(y)]
-        if isinstance(y_hat, (int, float)) == True:
-            y_hat = [float(y_hat)]
-        y = np.array(y)
-        y_hat = np.array(y_hat)
-        m = y.shape[0]
-        return ((-1 / m) * (y * np.log(y_hat + eps) + (1 - y) * np.log(1 - y_hat + eps))).sum()
-
-    @staticmethod
-    def add_intercept(x: np.ndarray) -> np.ndarray:
-        """Adds a column of 1’s to the non-empty numpy.array x.
-        Args:
-        x: has to be an numpy.array, a vector of shape m * 1.
+            y: has to be an numpy.ndarray, a vector of dimension m * 1.
+            y_hat: has to be an numpy.ndarray, a vector of dimension m * 1.
+            eps: has to be a float, epsilon (default=1e-15)
         Returns:
-        x as a numpy.array, a vector of shape m * 2.
-        None if x is not a numpy.array.
-        None if x is a empty numpy.array.
+            The logistic loss value as a float.
+            None on any error.
         Raises:
-        This function should not raise any Exception"""
-        if not isinstance(x, np.ndarray):
+            This function should not raise any Exception.
+        """
+        if y.shape != y_hat.shape:
             return None
-        try:
-            shape = (x.shape[0], 1)
-            ones = np.full(shape, 1)
-            res = np.concatenate((ones, x), axis=1)
-            return res
-        except ValueError:
-            return None
+        ones = np.ones(y.shape)
+        m = y.shape[0]
+        res = np.sum(y * np.log(y_hat + eps) + (ones - y)
+                     * np.log(ones - y_hat + eps)) / -m
+        return res
 
     @staticmethod
     def sigmoid_(x: np.ndarray) -> np.ndarray:
@@ -75,15 +54,49 @@ class MyLogisticRegression():
             return None
         return 1 / (1 + np.exp(-x))
 
-    def logistic_predict_(self, x):
-        """Computes the vector of prediction y_hat from two non-empty numpy.array.
+    @staticmethod
+    def add_intercept(x: np.ndarray, axis: int = 1) -> np.ndarray:
+        """Adds a column of 1's to the non-empty numpy.ndarray x.
         Args:
-        x: has to be an numpy.array, a vector of shape m * n.
-        theta: has to be an numpy.array, a vector of shape (n + 1) * 1.
-        Return:
-        y_hat: a numpy.array of shape m * 1, when x and theta numpy arrays
-        with expected and compatible shapes.
-        None: otherwise.
+            x: has to be an numpy.ndarray, a matrix of dimension m * n.
+        Returns:
+            X as a numpy.ndarray, a matrix of dimension m * (n + 1).
+            None if x is not a numpy.ndarray.
+            None if x is a empty numpy.ndarray.
+        Raises:
+            This function should not raise any Exception.
+        """
+        if not isinstance(x, np.ndarray) or x.size == 0:
+            return None
+        ones = np.ones((x.shape[0], 1))
+        res = np.concatenate((ones, x), axis=axis)
+        return res
+
+    @staticmethod
+    def sigmoid_(x: np.ndarray) -> np.ndarray:
+        """
+        Compute the sigmoid of a vector.
+        Args:
+            x: has to be an numpy.ndarray, a vector
+        Returns:
+            The sigmoid value as a numpy.ndarray.
+            None if x is an empty numpy.ndarray.
+        Raises:
+            This function should not raise any Exception.
+        """
+        if x.size == 0:
+            return None
+        return 1 / (1 + np.exp(-x))
+
+    def predict_(self, x: np.ndarray) -> np.ndarray:
+        """Computes the vector of prediction y_hat from two non-empty numpy.ndarray.
+        Args:
+        x: has to be an numpy.ndarray, a vector of dimension m * n.
+        theta: has to be an numpy.ndarray, a vector of dimension (n + 1) * 1.
+        Returns:
+        y_hat as a numpy.ndarray, a vector of dimension m * 1.
+        None if x or theta are empty numpy.ndarray.
+        None if x or theta dimensions are not appropriate.
         Raises:
         This function should not raise any Exception.
         """
@@ -92,27 +105,29 @@ class MyLogisticRegression():
         y = self.sigmoid_(x_.dot(self.theta))
         return y
 
-    def log_gradient(self, x, y):
-        """Computes a gradient vector from three non-empty numpy.array, with a for-loop.
-        The three arrays must have compatible shapes.
+    def gradient_(self, x: np.ndarray, y: np.ndarray) -> np.ndarray:
+        """Computes a gradient vector from three non-empty numpy.ndarray, without any a for-loop.
+            The three arrays must have compatible dimensions.
         Args:
-        x: has to be an numpy.array, a matrix of shape m * n.
-        y: has to be an numpy.array, a vector of shape m * 1.
-        theta: has to be an numpy.array, a vector (n +1) * 1.
-        Return:
-        The gradient as a numpy.array, a vector of shapes n * 1,
-        containing the result of the formula for all j.
-        None if x, y, or theta are empty numpy.array.
-        None if x, y and theta do not have compatible shapes.
-        None if x, y or theta is not of expected type.
+        x: has to be an numpy.ndarray, a matrix of dimension m * n.
+        y: has to be an numpy.ndarray, a vector of dimension m * 1.
+        theta: has to be an numpy.ndarray, a vector (n + 1) * 1.
+        Returns:
+        The gradient as a numpy.ndarray, a vector of dimensions (n + 1) * 1, containing
+            the result of the formula for all j.
+        None if x, y, or theta are empty numpy.ndarray.
+        None if x, y and theta do not have compatible dimensions.
         Raises:
         This function should not raise any Exception.
         """
-        m = x.shape[0]
-        y_hat = self.logistic_predict_(x)
+        theta = self.theta
+        if (0 in [x.size, y.size, theta.size] or x.shape[0] != y.shape[0] or
+                (x.shape[1] + 1) != theta.shape[0]):
+            return None
+        y_hat = self.predict_(x)
         x = self.add_intercept(x)
-        # ∇(J) = 1/mX'T(hθ(X) − y)
-        return x.T.dot(y_hat - y) / m
+        res = x.T.dot(y_hat - y) / x.shape[0]
+        return res
 
     def fit_(self, x: np.ndarray, y: np.ndarray) -> None:
         """
@@ -130,11 +145,7 @@ class MyLogisticRegression():
         Raises:
             This function should not raise any Exception.
         """
-        theta = self.theta
-        alpha = self.alpha
-        if x.shape[0] != y.shape[0] or (x.shape[1] + 1) != theta.shape[0]:
-            return None
         for _ in range(self.max_iter):
-            new_theta = self.log_gradient(x, y)
-            theta -= alpha * new_theta
-        self.theta = theta
+            grad = self.gradient_(x, y).sum(axis=1)
+            self.theta = self.theta - (self.alpha * grad).reshape((-1, 1))
+        return self

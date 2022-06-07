@@ -64,18 +64,16 @@ def gradient(x, y, theta):
     Raises:
         This function should not raise any Exception.
     """
-    if not isinstance(x, np.ndarray) or not isinstance(y, np.ndarray) or not isinstance(theta, np.ndarray):
-        return None
-    if len(x) == 0 or len(y) == 0 or len(theta) == 0:
-        return None
     try:
-        parenthesis = np.subtract(x.dot(theta), y)
-        coef = x.dot(1/x.shape[0])
-        # ∇(J) = 1/m * X'T * (X'θ − y)
-        return np.transpose(coef).dot(parenthesis)
-    except (ValueError, TypeError, np.core._exceptions.UFuncTypeError):
+        m = x.shape[0]
+        x = add_intercept(x)
+        res = x.T.dot(x.dot(theta) - y) / m
+        return res
+    except (ValueError, np.core._exceptions.UFuncTypeError):
         return None
 
+
+# you will implement linear gradient descent to fit your multivariate model to the dataset
 
 def fit_(x, y, theta, alpha, max_iter):
     """
@@ -96,11 +94,15 @@ def fit_(x, y, theta, alpha, max_iter):
     Raises:
         This function should not raise any Exception.
     """
-    x_ = add_intercept(x)
+    # repeat until convergence {
+    # compute ∇(J)
+    # θ := θ − α∇(J)
+    # }
+    # where ∇(J) is the entiere gradient vector (that is why we use gradient)
     for i in range(max_iter):
-        dt = gradient(x_, y, theta).sum(axis=1)
-        theta_update = (dt * alpha).reshape((-1, 1))
-        theta = theta - theta_update
+        swp = gradient(x, y, theta)
+        tmp = (swp * alpha)
+        theta = theta - tmp
     return theta
 
 
@@ -115,3 +117,19 @@ print(theta2)
 
 print("# Example 1:")
 print(predict_(x, theta2))
+
+print("CORRECTION: ")
+x = np.arange(1, 13).reshape(-1, 3)
+y = np.arange(9, 13).reshape(-1, 1)
+theta = np.array([[5], [4], [-2], [1]])
+alpha = 1e-2
+max_iter = 10000
+print(f"{fit_(x, y, theta, alpha = alpha, max_iter=max_iter)}")
+
+
+x = np.arange(1, 31).reshape(-1, 6)
+theta = np.array([[4], [3], [-1], [-5], [-5], [3], [-2]])
+y = np.array([[128], [256], [384], [512], [640]])
+alpha = 1e-4
+max_iter = 42000
+print(f"{fit_(x, y, theta, alpha=alpha, max_iter=max_iter)}")

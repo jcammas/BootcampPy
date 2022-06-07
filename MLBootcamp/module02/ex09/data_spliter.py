@@ -1,8 +1,9 @@
-from cgi import test
-import pandas as pd
 import numpy as np
-import math
 
+
+# The idea behind this exercice is to limit the possibility of having overfitting
+# Here, we want to separate our data between to pool => train & test
+# We also want to shuffle our test data in order to have something different every time
 
 def data_spliter(x, y, proportion):
     """Shuffles and splits the dataset (given by x and y) into a training and a test set,
@@ -60,7 +61,8 @@ print()
 
 
 print("CORRECTION:\n")
-x = np.ones(42).reshape((-1, 1))
+x = np.ones(42).reshape((-1, 1
+                         ))
 y = np.ones(42).reshape((-1, 1))
 ret = data_spliter(x, y, 0.42)
 print(list(map(np.shape, ret)))
