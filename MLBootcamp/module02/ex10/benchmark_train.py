@@ -247,19 +247,19 @@ def model_load(model):
     return data
 
 
-def plot_model(X, predicted_price, avocado_price, loss):
-    """"
-    plot our model in order to materialize our data
-    https://towardsdatascience.com/visualizing-data-with-pair-plots-in-python-f228cf529166"""
-    ax = plt.figure().add_subplot(projection='3d')
+# def plot_model(X, predicted_price, avocado_price, loss):
+#     """"
+#     plot our model in order to materialize our data
+#     https://towardsdatascience.com/visualizing-data-with-pair-plots-in-python-f228cf529166"""
+#     ax = plt.figure().add_subplot(projection='3d')
 
-    ax.scatter(X[:, 1], X[:, 2], avocado_price,
-               marker="*", c="g", label="Avocado price")
-    for i, y_hat in enumerate(predicted_price):
-        ax.scatter(X[:, 1], X[:, 2], y_hat, marker=["o", "s", "+", "*"][i],
-                   c=['r', 'y', 'm', 'b'][i], label=f"model {i}")
-    ax.legend()
-    plt.show()
+#     ax.scatter(X[:, 1], X[:, 2], avocado_price,
+#                marker="*", c="g", label="Avocado price")
+#     for i, y_hat in enumerate(predicted_price):
+#         ax.scatter(X[:, 1], X[:, 2], y_hat, marker=["o", "s", "+", "*"][i],
+#                    c=['r', 'y', 'm', 'b'][i], label=f"model {i}")
+#     ax.legend()
+#     plt.show()
 
 
 def build_model(X, Y, model):
@@ -304,7 +304,7 @@ def main():
         loss.append(l)
         predictions.append(pred)
 
-    plot_model(X, predictions, Y, loss)
+    # plot_model(X, predictions, Y, loss)
 
 
 if __name__ == "__main__":

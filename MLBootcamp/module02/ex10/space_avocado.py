@@ -46,7 +46,20 @@ def add_polynomial_features(x, power):
     return res
 
 
-def model_load():
+def model_load_all(i):
+    """In models.[csv/yml/pickle] one must find the parameters of all the
+    models you have explored and trained. In space_avocado.py train the model based on
+    the best hypothesis you find and load the other models from models.[csv/yml/pickle].
+    Then evaluate and plot the different graphics as asked before.
+    https://www.journaldev.com/15638/python-pickle-example
+    '"""
+    path = os.path.join(os.path.dirname(__file__), f"model_{i}.yml")
+    with open(path, 'rb') as f:
+        data = pickle.load(f)
+    return data
+
+
+def model_load_best():
     """In models.[csv/yml/pickle] one must find the parameters of all the
     models you have explored and trained. In space_avocado.py train the model based on
     the best hypothesis you find and load the other models from models.[csv/yml/pickle].
@@ -59,7 +72,30 @@ def model_load():
     return data
 
 
-def plot_model(X, predicted_price, avocado_price, loss):
+def plot_all_models(X, pred_price, true_price, costs):
+    plot_dim = 2
+    fig, axs_ = plt.subplots(plot_dim, plot_dim)
+    axs = []
+    for sublist in axs_:
+        for item in sublist:
+            axs.append(item)
+
+    for idx_feature, feature in enumerate(X.T):
+        for idx_pred, y_hat in enumerate(pred_price):
+            c = ['r', 'y', 'm', 'b']
+            color = c[idx_pred]
+            axs[idx_feature].scatter(
+                feature, y_hat, s=.1, c=color, label=f"Poly {idx_pred}")
+        axs[idx_feature].scatter(
+            feature, true_price, s=0.1, c='g', label="True")
+        axs[idx_feature].legend()
+
+    legend = [f"Pol {i}" for i in range(1, len(costs) + 1)]
+    axs[-1].bar(legend, costs)
+    plt.show()
+
+
+def plot_best_model(X, predicted_price, avocado_price, loss):
     """"
     plot our model in order to materialize our data
     https://towardsdatascience.com/visualizing-data-with-pair-plots-in-python-f228cf529166"""
@@ -70,7 +106,7 @@ def plot_model(X, predicted_price, avocado_price, loss):
                marker="*", c="g", label="Avocado price")
     for i, y_hat in enumerate(predicted_price):
         ax.scatter(X[:, 1], X[:, 2], y_hat, marker=["o", "s", "+", "*"][i],
-                   c=['r', 'y', 'm', 'b'][i], label=f"model {i}")
+                   c=['r', 'y', 'm', 'b'][i], label=f"best model")
     ax.legend()
     plt.show()
 
@@ -88,9 +124,25 @@ if __name__ == "__main__":
 
     costs = []
     preds = []
+    for i in range(1, 5):
+        print(f"Poly {i}")
+        X_poly = add_polynomial_features(X_, i)
+
+        lr = model_load_all(i)
+        lr.predict_(X_poly)
+
+        y_hat = lr.predict_(X_poly)
+        cost = lr.loss_(Y, y_hat)
+        print(f"{cost = }")
+        costs.append(cost)
+        preds.append(y_hat)
+        plot_all_models(X, preds, Y, costs)
+
+    costs = []
+    preds = []
     X_model = add_polynomial_features(X_, 4)
 
-    lr = model_load()
+    lr = model_load_best()
     lr.predict_(X_model)
 
     y_hat = lr.predict_(X_model)
@@ -99,4 +151,4 @@ if __name__ == "__main__":
     costs.append(cost)
     preds.append(y_hat)
 
-    plot_model(X, preds, Y, costs)
+    plot_best_model(X, preds, Y, costs)
